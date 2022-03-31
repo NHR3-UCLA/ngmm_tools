@@ -9,7 +9,7 @@ library(readxl)
 # Define variables
 # ---------------------------
 #input file names
-fname_flatfile_NGA2 <- '../../../Raw_files/NGAWest2/Updated_NGA_West2_Flatfile_RotD50_d050_public_version.xlsx'
+fname_flatfile_NGA2 <- '../../../Raw_files/nga_w2/Updated_NGA_West2_Flatfile_RotD50_d050_public_version.xlsx'
 
 #output directory
 out_dir <- '../../../Data/Verification/preprocessing/flatfiles/usable_mag_rrup'

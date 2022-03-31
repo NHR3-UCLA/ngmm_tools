@@ -37,8 +37,8 @@ utm_zone = '11S'
 region_id = 1
 
 #input file names
-fname_flatfile_NGA2ASK14 = '../../../../Nonerg_CA_GMM/Raw_files/GMM/nga_w2_resid/ASK14/run12_min3_R300/resid_T0.200.out2.txt'
-fname_flatfile_NGA2coor  = '../../../Raw_files/NGAWest2/Updated_NGA_West2_Flatfile_coordinates.csv'
+fname_flatfile_NGA2ASK14 = '../../../Raw_files/nga_w2_resid/resid_T0.200.out2.txt'
+fname_flatfile_NGA2coor  = '../../../Raw_files/nga_w2/Updated_NGA_West2_Flatfile_coordinates.csv'
 
 #flatfile file
 fname_flatfile = 'CatalogNGAWest2CA_ASK14'

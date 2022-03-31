@@ -47,7 +47,7 @@ year_max = 2021
 utm_zone = '11S'
 #input flatfiles
 fname_flatfile_newrec = '../../../Data/Verification/preprocessing/flatfiles/CA_NV_2011-2021_raw/Catalog_California_2011-2021.ver02.csv'
-fname_sta_vs30        = '../../../Raw_files/NGAWest3/IRIS/Catalog_California_2011-2021.ver02_station_Vs30PW.csv'
+fname_sta_vs30        = '../../../Raw_files/nga_w3/IRIS/Catalog_California_2011-2021.ver02_station_Vs30PW.csv'
 
 #flatfile file
 fname_flatfile = 'CatalogNewRecords_%.i-%.i_CA_NV'%(year_min, year_max )

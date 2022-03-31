@@ -35,8 +35,8 @@ rrup_thres = 300
 # projection system
 utm_zone = '11S'
 #input flatfiles
-fname_flatfile_newrec_eq  = '../../../Raw_files/NGAWest3/California2011-2017/eventcatalog.csv'
-fname_flatfile_newrec_sta = '../../../Raw_files/NGAWest3/California2011-2017/Recorddata.csv'
+fname_flatfile_newrec_eq  = '../../../Raw_files/nga_w3/California2011-2017/eventcatalog.csv'
+fname_flatfile_newrec_sta = '../../../Raw_files/nga_w3/California2011-2017/Recorddata.csv'
 
 #flatfile file
 fname_flatfile = 'CatalogNewRecords_2011-2017_CA_NV'

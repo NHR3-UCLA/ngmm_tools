@@ -7,11 +7,7 @@ Created on Tue Mar 15 14:50:27 2022
 """
 # Working directory and Packages
 # ---------------------------
-#change working directory
-import os
-os.chdir('/mnt/halcloud_nfs/glavrent/Research/Nonerg_GMM_methodology/Analyses/Code_Verification/regressions/ds1')
-
-#load variables
+#load packages
 import os
 import sys
 import pathlib

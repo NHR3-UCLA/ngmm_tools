@@ -30,8 +30,8 @@ import pylib_contour_plots as pylib_cplt
 # %% Define variables
 # ======================================
 #input file names
-fname_nrec_eq     = '../../../Raw_files/NGAWest3/IRIS/fdsnws-events_CA_2011-2021.csv'
-fname_nerc_sta    = '../../../Raw_files/NGAWest3/IRIS/fdsn-station_USA_[HB][HN]?.csv'
+fname_nrec_eq     = '../../../Raw_files/nga_w3/IRIS/fdsnws-events_CA_2011-2021.csv'
+fname_nerc_sta    = '../../../Raw_files/nga_w3/IRIS/fdsn-station_USA_[HB][HN]?.csv'
 fname_mag_rup_lim = '../../../Data/Verification/preprocessing/flatfiles/usable_mag_rrup/usable_Mag_Rrup_coeffs.csv'
 
 #output directoy

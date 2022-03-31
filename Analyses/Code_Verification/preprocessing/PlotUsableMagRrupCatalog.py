@@ -20,7 +20,7 @@ import matplotlib.ticker as mticker
 # %% Define variables
 # ======================================
 #input file names
-fname_flatfile_NGA2 = '../../../Raw_files/NGAWest2/Updated_NGA_West2_Flatfile_RotD50_d050_public_version.xlsx'
+fname_flatfile_NGA2 = '../../../Raw_files/nga_w2/Updated_NGA_West2_Flatfile_RotD50_d050_public_version.xlsx'
 fname_mag_rrup_lim  = '../../../Data/Verification/preprocessing/flatfiles/usable_mag_rrup/usable_Mag_Rrup_coeffs.csv'
 
 #output directoy

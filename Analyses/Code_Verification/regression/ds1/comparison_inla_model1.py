@@ -7,7 +7,7 @@ Created on Thu Aug 12 20:52:09 2021
 """
 # Working directory and Packages
 # ---------------------------
-#load variables
+#load packages
 import os
 import sys
 import pathlib
@@ -123,6 +123,7 @@ for d_id in ds_id:
     #regression results
     fname_reg_gmotion = '%s%s/Y%i/%s%s_Y%i_inla_%s'%(dir_results, ker_suffix+synds_suffix, d_id, prfx_results, synds_suffix, d_id, 'residuals')    + '.csv'
     fname_reg_coeff   = '%s%s/Y%i/%s%s_Y%i_inla_%s'%(dir_results, ker_suffix+synds_suffix, d_id, prfx_results, synds_suffix, d_id, 'coefficients') + '.csv'
+    
     #load synthetic results
     df_sdata_gmotion = pd.read_csv(fname_sdata_gmotion).set_index('rsn')
     #load regression results
