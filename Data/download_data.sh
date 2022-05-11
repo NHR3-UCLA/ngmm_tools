@@ -3,12 +3,15 @@
 #
 # Requires gdown to be installed
 
-#URL for pre-processing files. Includes flatfiles and cell attenuation files
-url_flt='https://drive.google.com/drive/folders/1_mqBGwz__MWEYeCSXTB7IGBwajvAyxhO?usp=sharing'
-#URL for synthetic data
-url_syn_ds='https://drive.google.com/drive/folders/1Dn2jgsCkfnjlfMEAlpcuO3CMqgvW12IM?usp=sharing'
+#URL for synthetic data and metadata
+url_syn_ds=https://drive.google.com/drive/folders/1Bh69OmzOvLOEeTfHI8D-MU9HgM0FJEl4?usp=sharing
 
 #download data
-gdown --folder $url_flt
+sleep 41
 gdown --folder $url_syn_ds
-
+# Clean verification folder
+rm -rdf ./Data/Verification
+# Merge folder_data to verification folder
+mkdir ./Data/Verification
+mv folder_data/* ./Data/Verification/.
+rm -d folder_data
