@@ -89,7 +89,7 @@ def ComputeDistUnGridCells(pt1, pt2, cells, diffx, diffy, flagUTM=False):
     normal = [0, 0, 1]
     ptz = np.ones(len(z_g_pts) * 3)
     if len(z_g_pts) > 0:
-        ptz = pty.reshape(len(z_g_pts), 3)
+        ptz = ptz.reshape(len(z_g_pts), 3)
         for i, zv in enumerate(z_g_pts):
             ptplane = [x_grid[0], y_grid[0], zv]
             d = np.divide(np.dot(np.subtract(ptplane,pt1),normal), np.dot(vec,normal))
@@ -216,8 +216,7 @@ def ComputeDistGridCells(pt1, pt2, cells, flagUTM=False):
     normal = [0, 0, 1]
     ptz = np.ones(len(z_g_pts) * 3)
     if len(z_g_pts) > 0:
-        import pdb; pdb.set_trace()
-        ptz = pty.reshape(len(z_g_pts), 3)
+        ptz = ptz.reshape(len(z_g_pts), 3)
         for i, zv in enumerate(z_g_pts):
             ptplane = [x_grid[0], y_grid[0], zv]
             d = np.divide(np.dot(np.subtract(ptplane,pt1),normal), np.dot(vec,normal))
