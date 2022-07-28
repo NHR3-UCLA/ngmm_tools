@@ -189,9 +189,9 @@ def RunStan(df_flatfile, df_cellinfo, df_celldist, stan_model_fname,
     ## Extract posterior samples
     # ---------------------------
     #hyper-parameters
-    col_names_hyp = ['dc_0','mu_2e','mu_3s',
+    col_names_hyp = ['dc_0','mu_2p','mu_3s',
                      'ell_1e', 'ell_1as', 'omega_1e', 'omega_1as', 'omega_1bs',
-                     'ell_2e', 'ell_3s', 'omega_2e', 'omega_3s',
+                     'ell_2p', 'ell_3s', 'omega_2p', 'omega_3s',
                      'mu_cap', 'omega_cap',
                      'phi_0','tau_0']
 
@@ -199,12 +199,12 @@ def RunStan(df_flatfile, df_cellinfo, df_celldist, stan_model_fname,
     col_names_dc_1e  = ['dc_1e.%i'%(k)    for k in range(n_eq)]
     col_names_dc_1as = ['dc_1as.%i'%(k)   for k in range(n_sta)]
     col_names_dc_1bs = ['dc_1bs.%i'%(k)   for k in range(n_sta)]
-    col_names_c_2e   = ['c_2e.%i'%(k)     for k in range(n_eq)]
+    col_names_c_2p   = ['c_2p.%i'%(k)     for k in range(n_eq)]
     col_names_c_3s   = ['c_3s.%i'%(k)     for k in range(n_sta)]
     col_names_dB     = ['dB.%i'%(k)       for k in range(n_eq)]
     col_names_cap    = ['c_cap.%i'%(c_id) for c_id in cell_ids_valid]
     col_names_all = (col_names_hyp + col_names_dc_1e + col_names_dc_1as + col_names_dc_1bs + 
-                     col_names_c_2e + col_names_c_3s + col_names_cap + col_names_dB)
+                     col_names_c_2p + col_names_c_3s + col_names_cap + col_names_dB)
     
     #sumarize raw posterior distributions
     stan_posterior = np.stack([stan_fit.stan_variable(c_n) for c_n in col_names_hyp], axis=1)
@@ -212,7 +212,7 @@ def RunStan(df_flatfile, df_cellinfo, df_celldist, stan_model_fname,
     stan_posterior = np.concatenate((stan_posterior, stan_fit.stan_variable('dc_1e')),  axis=1)
     stan_posterior = np.concatenate((stan_posterior, stan_fit.stan_variable('dc_1as')), axis=1)
     stan_posterior = np.concatenate((stan_posterior, stan_fit.stan_variable('dc_1bs')), axis=1)
-    stan_posterior = np.concatenate((stan_posterior, stan_fit.stan_variable('c_2e')),   axis=1)
+    stan_posterior = np.concatenate((stan_posterior, stan_fit.stan_variable('c_2p')),   axis=1)
     stan_posterior = np.concatenate((stan_posterior, stan_fit.stan_variable('c_3s')),   axis=1)
     stan_posterior = np.concatenate((stan_posterior, stan_fit.stan_variable('c_cap')),  axis=1)
     stan_posterior = np.concatenate((stan_posterior, stan_fit.stan_variable('dB')),     axis=1)
@@ -228,7 +228,7 @@ def RunStan(df_flatfile, df_cellinfo, df_celldist, stan_model_fname,
     df_stan_hyp = df_stan_posterior_raw[col_names_hyp].quantile(perc_array)
     df_stan_hyp = df_stan_hyp.append(df_stan_posterior_raw[col_names_hyp].mean(axis = 0), ignore_index=True)
     df_stan_hyp.index = ['prc_%.2f'%(prc) for prc in perc_array]+['mean'] 
-    df_stan_hyp.to_csv(out_dir + out_fname + '_stan_hyperparamters' + '.csv', index=True)
+    df_stan_hyp.to_csv(out_dir + out_fname + '_stan_hyperparameters' + '.csv', index=True)
     
     #detailed posterior percentiles of posterior distributions
     perc_array = np.arange(0.01,0.99,0.01)    
@@ -236,7 +236,7 @@ def RunStan(df_flatfile, df_cellinfo, df_celldist, stan_model_fname,
     df_stan_posterior.index.name = 'prc'
     df_stan_posterior .to_csv(out_dir + out_fname + '_stan_hyperposterior' + '.csv', index=True)
     
-    del col_names_dc_1e, col_names_dc_1as, col_names_dc_1bs, col_names_dB
+    del col_names_dc_1e, col_names_dc_1as, col_names_dc_1bs, col_names_c_2p, col_names_c_3s, col_names_dB
     del stan_posterior, col_names_all
     
     ## Sample spatially varying coefficients and predictions at record locations
@@ -300,12 +300,12 @@ def RunStan(df_flatfile, df_cellinfo, df_celldist, stan_model_fname,
     coeff_1bs_sig = coeff_1bs_sig[sta_inv]
     
     #spatially varying geometrical spreading coefficient
-    coeff_2e_mu  = np.array([df_stan_posterior_raw.loc[:,f'c_2e.{k}'].mean()   for k in range(n_eq)])
-    coeff_2e_mu  = coeff_2e_mu[eq_inv]
-    coeff_2e_med = np.array([df_stan_posterior_raw.loc[:,f'c_2e.{k}'].median() for k in range(n_eq)])
-    coeff_2e_med = coeff_2e_med[eq_inv]
-    coeff_2e_sig = np.array([df_stan_posterior_raw.loc[:,f'c_2e.{k}'].std()    for k in range(n_eq)])
-    coeff_2e_sig = coeff_2e_sig[eq_inv]
+    coeff_2p_mu  = np.array([df_stan_posterior_raw.loc[:,f'c_2p.{k}'].mean()   for k in range(n_eq)])
+    coeff_2p_mu  = coeff_2p_mu[eq_inv]
+    coeff_2p_med = np.array([df_stan_posterior_raw.loc[:,f'c_2p.{k}'].median() for k in range(n_eq)])
+    coeff_2p_med = coeff_2p_med[eq_inv]
+    coeff_2p_sig = np.array([df_stan_posterior_raw.loc[:,f'c_2p.{k}'].std()    for k in range(n_eq)])
+    coeff_2p_sig = coeff_2p_sig[eq_inv]
     
     #spatially varying Vs30 coefficient
     coeff_3s_mu  = np.array([df_stan_posterior_raw.loc[:,f'c_3s.{k}'].mean()   for k in range(n_sta)])
@@ -327,26 +327,26 @@ def RunStan(df_flatfile, df_cellinfo, df_celldist, stan_model_fname,
                                 coeff_1e_mu, 
                                 coeff_1as_mu,
                                 coeff_1bs_mu,
-                                coeff_2e_mu, 
+                                coeff_2p_mu, 
                                 coeff_3s_mu,
                                 cells_LcA_mu,
                                 coeff_0_med,
                                 coeff_1e_med, 
                                 coeff_1as_med,
                                 coeff_1bs_med,
-                                coeff_2e_med, 
+                                coeff_2p_med, 
                                 coeff_3s_med,
                                 cells_LcA_med,
                                 coeff_0_sig,
                                 coeff_1e_sig, 
                                 coeff_1as_sig,
                                 coeff_1bs_sig,
-                                coeff_2e_sig, 
+                                coeff_2p_sig, 
                                 coeff_3s_sig,
                                 cells_LcA_sig)).T
-    columns_names = ['dc_0_mean','dc_1e_mean','dc_1as_mean','dc_1bs_mean','c_2e_mean','c_3s_mean','Lc_ca_mean',
-                     'dc_0_med', 'dc_1e_med', 'dc_1as_med', 'dc_1bs_med', 'c_2e_med', 'c_3s_med', 'Lc_ca_med',
-                     'dc_0_sig', 'dc_1e_sig', 'dc_1as_sig', 'dc_1bs_sig', 'c_2e_sig', 'c_3s_sig', 'Lc_ca_sig']
+    columns_names = ['dc_0_mean','dc_1e_mean','dc_1as_mean','dc_1bs_mean','c_2p_mean','c_3s_mean','Lc_ca_mean',
+                     'dc_0_med', 'dc_1e_med', 'dc_1as_med', 'dc_1bs_med', 'c_2p_med', 'c_3s_med', 'Lc_ca_med',
+                     'dc_0_sig', 'dc_1e_sig', 'dc_1as_sig', 'dc_1bs_sig', 'c_2p_sig', 'c_3s_sig', 'Lc_ca_sig']
     df_coeffs_summary = pd.DataFrame(coeffs_summary, columns = columns_names, index=df_flatfile.index)
     #create dataframe with summary coefficients
     df_coeffs_summary = pd.merge(df_flatinfo, df_coeffs_summary, how='right', left_index=True, right_index=True)
@@ -356,7 +356,7 @@ def RunStan(df_flatfile, df_cellinfo, df_celldist, stan_model_fname,
     # GMM prediction
     #---  ---  ---  ---  ---  ---  ---  ---
     #mean prediction
-    y_mu  = (coeff_0_mu + coeff_1e_mu + coeff_1as_mu + coeff_1bs_mu + cells_LcA_mu)
+    y_mu  = (coeff_0_mu + coeff_1e_mu + coeff_1as_mu + coeff_1bs_mu + coeff_2p_mu*x_2 + coeff_3s_mu*x_3[sta_inv] + cells_LcA_mu)
 
     #compute residuals
     res_tot     = y_data - y_mu

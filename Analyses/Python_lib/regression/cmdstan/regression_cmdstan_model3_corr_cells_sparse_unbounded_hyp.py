@@ -11,6 +11,7 @@ import pathlib
 from joblib import cpu_count
 #arithmetic libraries
 import numpy as np
+from scipy import sparse 
 #statistics libraries
 import pandas as pd
 #plot libraries
@@ -126,7 +127,8 @@ def RunStan(df_flatfile, df_cellinfo, df_celldist, stan_model_fname,
     i_cells_valid = np.where(celldist_all.sum(axis=0) > 0)[0] #valid cells with more than one path
     cell_ids_valid   = cell_ids_all[i_cells_valid]
     cell_names_valid = cell_names_all[i_cells_valid]
-    celldist_valid   = celldist_all.loc[:,cell_names_valid] #cell-distance with only non-zero cells
+    celldist_valid    = celldist_all.loc[:,cell_names_valid] #cell-distance with only non-zero cells
+    celldist_valid_sp = sparse.csr_matrix(celldist_valid)
     #number of cells
     n_cell = celldist_all.shape[1]
     n_cell_valid = celldist_valid.shape[1]
@@ -139,6 +141,7 @@ def RunStan(df_flatfile, df_cellinfo, df_celldist, stan_model_fname,
                  'NEQ':     n_eq,
                  'NSTAT':   n_sta,
                  'NCELL':   n_cell_valid,
+                 'NCELL_SP': len(celldist_valid_sp.data),
                  'eq':      eq_id,                  #earthquake id
                  'stat':    sta_id,                 #station id
                  'rec_mu':  np.zeros(y_data.shape),
@@ -151,7 +154,9 @@ def RunStan(df_flatfile, df_cellinfo, df_celldist, stan_model_fname,
                  'X_e':     X_eq,                   #earthquake coordinates
                  'X_s':     X_sta,                  #station coordinates
                  'X_c':     X_cells_valid,
-                 'RC':      celldist_valid.to_numpy(),
+                 'RC_val':   celldist_valid_sp.data,
+                 'RC_w':     celldist_valid_sp.indices+1,
+                 'RC_u':     celldist_valid_sp.indptr+1,
                 }
     stan_data_fname = out_dir + out_fname + '_stan_data' + '.json'
     
@@ -238,7 +243,7 @@ def RunStan(df_flatfile, df_cellinfo, df_celldist, stan_model_fname,
     perc_array = np.arange(0.01,0.99,0.01)    
     df_stan_posterior = df_stan_posterior_raw[col_names_hyp].quantile(perc_array)
     df_stan_posterior.index.name = 'prc'
-    df_stan_posterior .to_csv(out_dir + out_fname + '_stan_hyperposterior' + '.csv', index=True)
+    df_stan_posterior.to_csv(out_dir + out_fname + '_stan_hyperposterior' + '.csv', index=True)
     
     del col_names_dc_1e, col_names_dc_1as, col_names_dc_1bs, col_names_c_2p, col_names_c_3s, col_names_dB
     del stan_posterior, col_names_all
@@ -256,10 +261,10 @@ def RunStan(df_flatfile, df_cellinfo, df_celldist, stan_model_fname,
     cells_ca_sig = np.array([df_stan_posterior_raw.loc[:,'c_cap.%i'%(k)].std()    for k in cell_ids_valid])
     
     #effect of anelastic attenuation in GM
-    cells_LcA_mu  = celldist_valid.values @ cells_ca_mu
-    cells_LcA_med = celldist_valid.values @ cells_ca_med
-    cells_LcA_sig = np.sqrt(np.square(celldist_valid.values) @ cells_ca_sig**2)
-        
+    cells_LcA_mu  = celldist_valid_sp @ cells_ca_mu
+    cells_LcA_med = celldist_valid_sp @ cells_ca_med
+    cells_LcA_sig = np.sqrt(celldist_valid_sp.power(2) @ cells_ca_sig**2)
+    
     #summary attenuation cells
     catten_summary = np.vstack((np.tile(c_a_erg,  n_cell_valid),
                                 cells_ca_mu,

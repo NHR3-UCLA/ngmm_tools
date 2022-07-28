@@ -516,14 +516,14 @@ def PlotContourSloveniaMap(cont_latlondata, cmin=None,  cmax=None, flag_grid=Fal
 # Scatter plot function
 #----  ----  ----  ----  ----  ----  ----
 def PlotScatterCAMap(scat_latlondata, cmin=None,  cmax=None, flag_grid=False, title=None, cbar_label=None, log_cbar = False, 
-                     frmt_clb = '%.2f', alpha_v = 0.7, cmap='seismic'):
+                     frmt_clb = '%.2f', alpha_v = 0.7, cmap='seismic', marker_size=10.):
     '''
     PlotContourCAMap:
         create a contour plot of the data in cont_latlondata
         
     Input Arguments:
-        scat_latlondata (np.array [n1,3]):       contains the latitude, logitude and contour values
-                                                 scat_latlondata = [lat, long, data]
+        scat_latlondata (np.array [n1,(3,4)]):   contains the latitude, logitude, contour values, and size values (optional)
+                                                 scat_latlondata = [lat, long, data_color, data_size]
         cmin (double-opt):                       lower limit for color levels for contour plot 
         cmax (double-opt):                       upper limit for color levels for contour plot 
         title (str-opt):                         figure title
@@ -531,7 +531,10 @@ def PlotScatterCAMap(scat_latlondata, cmin=None,  cmax=None, flag_grid=False, ti
         ptlevs (np.array-opt):                   color levels for points
         pt_label (str-opt):                      points color bar label
         log_cbar (bool-opt):                     if true use log-scale for contour plots
-        frmt_clb                                 string format color bar ticks
+        frmt_clb:                                string format color bar ticks
+        alpha_v:                                 opacity value
+        cmap: 					   color palette
+        marker_size:				   marker size, if scat_latlondata dimensions is [n1, 3]
     
     Output Arguments:
         
@@ -563,7 +566,7 @@ def PlotScatterCAMap(scat_latlondata, cmin=None,  cmax=None, flag_grid=False, ti
     if scat_latlondata.shape[1] > 3:
         data_scat_s = scat_latlondata[:,3]
     else:
-        data_scat_s = 10. * np.ones(data_scat_c.shape)
+        data_scat_s = marker_size * np.ones(data_scat_c.shape)
         
     #data colorbar
     cbmin = data_scat_c.min() if cmin is None else cmin
@@ -596,7 +599,7 @@ def PlotScatterCAMap(scat_latlondata, cmin=None,  cmax=None, flag_grid=False, ti
     #oceans
     oceans = cfeature.NaturalEarthFeature(category='physical', name='ocean', facecolor='lightblue',
                                           scale=plt_scale)
-    ax.add_feature(oceans, zorder=6)
+    ax.add_feature(oceans, zorder=2)
     
     #add figure title
     if (not title is None): plt.title(title, fontsize=25)
@@ -696,7 +699,7 @@ def PlotCellsCAMap(cell_latlondata, cmin=None,  cmax=None, flag_grid=False, titl
     #ax.stock_img()
     oceans = cfeature.NaturalEarthFeature(category='physical', name='ocean', facecolor='lightblue',
                                           scale=plt_scale)
-    ax.add_feature(oceans, zorder=6)
+    ax.add_feature(oceans, zorder=2)
     
     #add figure title
     if (not title is None): ax.set_title(title, fontsize=25)

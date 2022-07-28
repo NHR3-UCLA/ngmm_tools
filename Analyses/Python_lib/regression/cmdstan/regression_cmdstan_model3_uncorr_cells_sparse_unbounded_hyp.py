@@ -11,6 +11,7 @@ import pathlib
 from joblib import cpu_count
 #arithmetic libraries
 import numpy as np
+from scipy import sparse 
 #statistics libraries
 import pandas as pd
 #plot libraries
@@ -22,15 +23,14 @@ mpl.use('agg')
 import cmdstanpy
 
 def RunStan(df_flatfile, df_cellinfo, df_celldist, stan_model_fname, 
-            out_fname, out_dir, res_name='res', c_2_erg=0, c_3_erg=0, c_a_erg=0, 
+            out_fname, out_dir, res_name='res', c_2_erg=0, c_3_erg=0, c_a_erg=0,  
             n_iter_warmup=300, n_iter_sampling=300, n_chains=4,
             adapt_delta=0.8, max_treedepth=10,
             stan_parallel=False):
     '''
     Run full Bayessian regression in Stan. Non-ergodic model includes: a spatially
     varying earthquake constant, a spatially varying site constant, a spatially 
-    independent site constant, and partially spatially correlated anelastic 
-    attenuation.
+    independent site constant, and uncorrelated anelastic attenuation.
 
     Parameters
     ----------
@@ -48,10 +48,6 @@ def RunStan(df_flatfile, df_cellinfo, df_celldist, stan_model_fname,
         Output directory.
     res_name : string, optional
         Column name for total residuals. The default is 'res'.
-    c_2_erg : double, optional
-        Value of ergodic geometrical spreading coefficient. The default is 0.
-    c_3_erg : double, optional
-        Value of ergodic Vs30 coefficient. The default is 0.
     c_a_erg : double, optional
         Value of ergodic anelatic attenuation coefficient. Used as mean of cell
         specific anelastic attenuation prior distribution. The default is 0.
@@ -65,7 +61,9 @@ def RunStan(df_flatfile, df_cellinfo, df_celldist, stan_model_fname,
         Target average proposal acceptance probability for adaptation. The default is 0.8.
     max_treedepth : integer, optional
         Maximum number of evaluations for each iteration (2^max_treedepth). The default is 10.
-    stan_parallel : bool, optional
+    pystan_ver : integer, optional
+        Version of pystan to run. The default is 2.
+    pystan_parallel : bool, optional
         Flag for using multithreaded option in STAN. The default is False.
 
     Returns
@@ -73,7 +71,7 @@ def RunStan(df_flatfile, df_cellinfo, df_celldist, stan_model_fname,
     None.
 
     '''
-                 
+                
     ## Preprocess Input Data
     #============================
     #set rsn column as dataframe index, skip if rsn already the index
@@ -105,14 +103,13 @@ def RunStan(df_flatfile, df_cellinfo, df_celldist, stan_model_fname,
     #create station indices for all records (1 to n_sta)
     sta_id = sta_inv + 1
     n_sta = len(data_sta)
+    #ground-motion observations  
+    y_data = df_flatfile[res_name].to_numpy().copy()
     
     #geometrical spreading covariates
     x_2 = df_flatfile['x_2'].values
     #vs30 covariates
     x_3 = df_flatfile['x_3'].values[sta_idx]
-
-    #ground-motion observations  
-    y_data = df_flatfile[res_name].to_numpy().copy()
     
     #cell data
     #reorder and only keep records included in the flatfile
@@ -127,6 +124,7 @@ def RunStan(df_flatfile, df_cellinfo, df_celldist, stan_model_fname,
     cell_ids_valid   = cell_ids_all[i_cells_valid]
     cell_names_valid = cell_names_all[i_cells_valid]
     celldist_valid   = celldist_all.loc[:,cell_names_valid] #cell-distance with only non-zero cells
+    celldist_valid_sp = sparse.csr_matrix(celldist_valid)
     #number of cells
     n_cell = celldist_all.shape[1]
     n_cell_valid = celldist_valid.shape[1]
@@ -139,6 +137,7 @@ def RunStan(df_flatfile, df_cellinfo, df_celldist, stan_model_fname,
                  'NEQ':     n_eq,
                  'NSTAT':   n_sta,
                  'NCELL':   n_cell_valid,
+                 'NCELL_SP': len(celldist_valid_sp.data),
                  'eq':      eq_id,                  #earthquake id
                  'stat':    sta_id,                 #station id
                  'rec_mu':  np.zeros(y_data.shape),
@@ -151,7 +150,9 @@ def RunStan(df_flatfile, df_cellinfo, df_celldist, stan_model_fname,
                  'X_e':     X_eq,                   #earthquake coordinates
                  'X_s':     X_sta,                  #station coordinates
                  'X_c':     X_cells_valid,
-                 'RC':      celldist_valid.to_numpy(),
+                 'RC_val':   celldist_valid_sp.data,
+                 'RC_w':     celldist_valid_sp.indices+1,
+                 'RC_u':     celldist_valid_sp.indptr+1,
                 }
     stan_data_fname = out_dir + out_fname + '_stan_data' + '.json'
     
@@ -160,7 +161,7 @@ def RunStan(df_flatfile, df_cellinfo, df_celldist, stan_model_fname,
 
     #write as json file
     cmdstanpy.utils.write_stan_json(stan_data_fname, stan_data)
-    
+
     ## Run Stan, fit model 
     #============================
     #number of cores
@@ -196,7 +197,7 @@ def RunStan(df_flatfile, df_cellinfo, df_celldist, stan_model_fname,
     col_names_hyp = ['dc_0','mu_2p','mu_3s',
                      'ell_1e', 'ell_1as', 'omega_1e', 'omega_1as', 'omega_1bs',
                      'ell_2p', 'ell_3s', 'omega_2p', 'omega_3s',
-                     'mu_cap', 'ell_ca1p', 'omega_ca1p', 'omega_ca2p',
+                     'mu_cap', 'omega_cap',
                      'phi_0','tau_0']
 
     #non-ergodic terms
@@ -210,7 +211,7 @@ def RunStan(df_flatfile, df_cellinfo, df_celldist, stan_model_fname,
     col_names_all = (col_names_hyp + col_names_dc_1e + col_names_dc_1as + col_names_dc_1bs + 
                      col_names_c_2p + col_names_c_3s + col_names_cap + col_names_dB)
     
-    #summarize raw posterior distributions
+    #sumarize raw posterior distributions
     stan_posterior = np.stack([stan_fit.stan_variable(c_n) for c_n in col_names_hyp], axis=1)
     #adjustment terms 
     stan_posterior = np.concatenate((stan_posterior, stan_fit.stan_variable('dc_1e')),  axis=1)
@@ -226,7 +227,7 @@ def RunStan(df_flatfile, df_cellinfo, df_celldist, stan_model_fname,
     df_stan_posterior_raw.to_csv(out_dir + out_fname + '_stan_posterior_raw' + '.csv', index=False)
     
     ## Summarize hyper-parameters
-    # ---------------------------
+    # ---------------------------    
     #summarize posterior distributions of hyper-parameters
     perc_array = np.array([0.05,0.25,0.5,0.75,0.95])
     df_stan_hyp = df_stan_posterior_raw[col_names_hyp].quantile(perc_array)
@@ -238,7 +239,7 @@ def RunStan(df_flatfile, df_cellinfo, df_celldist, stan_model_fname,
     perc_array = np.arange(0.01,0.99,0.01)    
     df_stan_posterior = df_stan_posterior_raw[col_names_hyp].quantile(perc_array)
     df_stan_posterior.index.name = 'prc'
-    df_stan_posterior .to_csv(out_dir + out_fname + '_stan_hyperposterior' + '.csv', index=True)
+    df_stan_posterior.to_csv(out_dir + out_fname + '_stan_hyperposterior' + '.csv', index=True)
     
     del col_names_dc_1e, col_names_dc_1as, col_names_dc_1bs, col_names_c_2p, col_names_c_3s, col_names_dB
     del stan_posterior, col_names_all
@@ -256,9 +257,9 @@ def RunStan(df_flatfile, df_cellinfo, df_celldist, stan_model_fname,
     cells_ca_sig = np.array([df_stan_posterior_raw.loc[:,'c_cap.%i'%(k)].std()    for k in cell_ids_valid])
     
     #effect of anelastic attenuation in GM
-    cells_LcA_mu  = celldist_valid.values @ cells_ca_mu
-    cells_LcA_med = celldist_valid.values @ cells_ca_med
-    cells_LcA_sig = np.sqrt(np.square(celldist_valid.values) @ cells_ca_sig**2)
+    cells_LcA_mu  = celldist_valid_sp @ cells_ca_mu
+    cells_LcA_med = celldist_valid_sp @ cells_ca_med
+    cells_LcA_sig = np.sqrt(celldist_valid_sp.power(2) @ cells_ca_sig**2)
         
     #summary attenuation cells
     catten_summary = np.vstack((np.tile(c_a_erg,  n_cell_valid),
@@ -318,12 +319,12 @@ def RunStan(df_flatfile, df_cellinfo, df_celldist, stan_model_fname,
     coeff_3s_med = coeff_3s_med[sta_inv]
     coeff_3s_sig = np.array([df_stan_posterior_raw.loc[:,f'c_3s.{k}'].std()    for k in range(n_sta)])
     coeff_3s_sig = coeff_3s_sig[sta_inv]
-    
+
     # aleatory variability
     phi_0_array = np.array([df_stan_posterior_raw.phi_0.mean()]*X_sta_all.shape[0])
     tau_0_array = np.array([df_stan_posterior_raw.tau_0.mean()]*X_sta_all.shape[0])
     
-    #initiaize flatfile for sumamry of non-erg coefficinets and residuals
+    #dataframe with flatfile info
     df_flatinfo = df_flatfile[['eqid','ssn','eqLat','eqLon','staLat','staLon','eqX','eqY','staX','staY','UTMzone']]
     
     #summary coefficients

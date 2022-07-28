@@ -183,7 +183,7 @@ def RunStan(df_flatfile, stan_model_fname,
     perc_array = np.arange(0.01,0.99,0.01)    
     df_stan_posterior = df_stan_posterior_raw[col_names_hyp].quantile(perc_array)
     df_stan_posterior.index.name = 'prc'
-    df_stan_posterior .to_csv(out_dir + out_fname + '_stan_hyperposterior' + '.csv', index=True)
+    df_stan_posterior.to_csv(out_dir + out_fname + '_stan_hyperposterior' + '.csv', index=True)
     
     del col_names_dc_1e, col_names_dc_1as, col_names_dc_1bs, col_names_dB
     del stan_posterior, col_names_all

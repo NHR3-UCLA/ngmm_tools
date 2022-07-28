@@ -213,7 +213,7 @@ def RunStan(df_flatfile, df_cellinfo, df_celldist, stan_model_fname,
     df_stan_hyp = df_stan_posterior_raw[col_names_hyp].quantile(perc_array)
     df_stan_hyp = df_stan_hyp.append(df_stan_posterior_raw[col_names_hyp].mean(axis = 0), ignore_index=True)
     df_stan_hyp.index = ['prc_%.2f'%(prc) for prc in perc_array]+['mean'] 
-    df_stan_hyp.to_csv(out_dir + out_fname + '_stan_hyperparamters' + '.csv', index=True)
+    df_stan_hyp.to_csv(out_dir + out_fname + '_stan_hyperparameters' + '.csv', index=True)
     
     #detailed posterior percentiles of posterior distributions
     perc_array = np.arange(0.01,0.99,0.01)    
