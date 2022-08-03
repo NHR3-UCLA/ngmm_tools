@@ -228,7 +228,7 @@ RunINLA <- function(df_flatfile, df_cellinfo, df_cellmat, out_fname, out_dir, re
   
   #cell-specific anelastic attenuation
   #---   ---   ---   ---   ---   ---
-  prior_omega_ca <- list(prec = list(prior = 'pc.prec', param = c(0.01, 0.01))) 
+  prior_omega_ca <- list(prec = list(prior = 'pc.prec', param = c(0.01, 0.1))) 
   
   #cell ids
   df_inla_covar$idx_cell <- 1:nrow(df_inla_covar)
@@ -297,18 +297,18 @@ RunINLA <- function(df_flatfile, df_cellinfo, df_cellmat, out_fname, out_dir, re
   
   hyp_param['dc_0',]    <- fit_inla_spatial$summary.fixed['intcp',]
   #
-  hyp_param['mu_2e',]    <- fit_inla_spatial$summary.fixed['x2',]
+  hyp_param['mu_2p',]    <- fit_inla_spatial$summary.fixed['x2',]
   hyp_param['mu_3s',]    <- fit_inla_spatial$summary.fixed['x3',]
   #correlation lengths of spatial terms
   hyp_param['ell_1e',]  <- fit_inla_spatial$summary.hyperpar['Range for idx.eq_const',]
   hyp_param['ell_1as',] <- fit_inla_spatial$summary.hyperpar['Range for idx.sta_const',]
-  hyp_param['ell_2e',]  <- fit_inla_spatial$summary.hyperpar['Range for idx.eq_gs',]
+  hyp_param['ell_2p',]  <- fit_inla_spatial$summary.hyperpar['Range for idx.eq_gs',]
   hyp_param['ell_3s',]  <- fit_inla_spatial$summary.hyperpar['Range for idx.sta_vs30',]
   #standard deviations of spatial terms
   hyp_param['omega_1e',]  <- fit_inla_spatial$summary.hyperpar['Stdev for idx.eq_const',]
   hyp_param['omega_1as',] <- fit_inla_spatial$summary.hyperpar['Stdev for idx.sta_const',]  
   hyp_param['omega_1bs',] <- 1/sqrt(fit_inla_spatial$summary.hyperpar['Precision for sta',] ) 
-  hyp_param['omega_2e',]  <- fit_inla_spatial$summary.hyperpar['Stdev for idx.eq_gs',]
+  hyp_param['omega_2p',]  <- fit_inla_spatial$summary.hyperpar['Stdev for idx.eq_gs',]
   hyp_param['omega_3s',]  <- fit_inla_spatial$summary.hyperpar['Stdev for idx.sta_vs30',]  
   #anelastic attenuation
   hyp_param['mu_cap',]    <- fit_inla_spatial$summary.fixed['R',]
@@ -327,7 +327,7 @@ RunINLA <- function(df_flatfile, df_cellinfo, df_cellmat, out_fname, out_dir, re
   coeff_1e  <- fit_inla_spatial$summary.random$idx.eq_const
   coeff_1as <- fit_inla_spatial$summary.random$idx.sta_const
   coeff_1bs <- fit_inla_spatial$summary.random$sta
-  coeff_2e  <- fit_inla_spatial$summary.random$idx.eq_gs
+  coeff_2p  <- fit_inla_spatial$summary.random$idx.eq_gs
   coeff_3s  <- fit_inla_spatial$summary.random$idx.sta_vs30
   #coeff mean and std
   coeff_1e_mu   <- inla.mesh.project(prjct_grid_eq,  coeff_1e$mean)
@@ -336,8 +336,8 @@ RunINLA <- function(df_flatfile, df_cellinfo, df_cellmat, out_fname, out_dir, re
   coeff_1as_sig <- inla.mesh.project(prjct_grid_sta, coeff_1as$sd)
   coeff_1bs_mu  <- coeff_1bs$mean
   coeff_1bs_sig <- coeff_1bs$sd
-  coeff_2e_mu   <- inla.mesh.project(prjct_grid_eq,  coeff_2e$mean)      + hyp_param['mu_2e','mean']
-  coeff_2e_sig  <- sqrt(inla.mesh.project(prjct_grid_eq,  coeff_2e$sd)^2 + hyp_param['mu_2e','sd']^2)
+  coeff_2p_mu   <- inla.mesh.project(prjct_grid_eq,  coeff_2p$mean)      + hyp_param['mu_2p','mean']
+  coeff_2p_sig  <- sqrt(inla.mesh.project(prjct_grid_eq,  coeff_2p$sd)^2 + hyp_param['mu_2p','sd']^2)
   coeff_3s_mu   <- inla.mesh.project(prjct_grid_sta, coeff_3s$mean)      + hyp_param['mu_3s','mean']
   coeff_3s_sig  <- sqrt(inla.mesh.project(prjct_grid_sta, coeff_3s$sd)^2 + hyp_param['mu_3s','sd']^2)
   #cell specific anelastic attenuation
@@ -351,7 +351,7 @@ RunINLA <- function(df_flatfile, df_cellinfo, df_cellmat, out_fname, out_dir, re
   
   #mean prediction
   y_new_mu <- hyp_param['dc_0','mean'] + coeff_1e_mu[eq_inv] + coeff_1as_mu[sta_inv] + coeff_1bs_mu[sta_inv] + 
-              x_2 * coeff_2e_mu[eq_inv] + x_3 * coeff_3s_mu[sta_inv] +
+              x_2 * coeff_2p_mu[eq_inv] + x_3 * coeff_3s_mu[sta_inv] +
               cells_Lcap_mu
   
   #residuals
@@ -369,13 +369,13 @@ RunINLA <- function(df_flatfile, df_cellinfo, df_cellmat, out_fname, out_dir, re
                          dc_1e_mean=coeff_1e_mu[eq_inv],  
                          dc_1as_mean=coeff_1as_mu[sta_inv],
                          dc_1bs_mean=coeff_1bs_mu[sta_inv], 
-                         c_2e_mean=coeff_2e_mu[eq_inv],  
+                         c_2p_mean=coeff_2p_mu[eq_inv],  
                          c_3s_mean=coeff_3s_mu[sta_inv],
                          dc_0_sig=hyp_param['dc_0','sd'], 
                          dc_1e_sig=coeff_1e_sig[eq_inv], 
                          dc_1as_sig=coeff_1as_sig[sta_inv], 
                          dc_1bs_sig=coeff_1bs_sig[sta_inv],
-                         c_2e_sig=coeff_2e_sig[eq_inv], 
+                         c_2p_sig=coeff_2p_sig[eq_inv], 
                          c_3s_sig=coeff_3s_sig[sta_inv])
   df_coeff <- merge(df_flatinfo, df_coeff, by=c('rsn'))
   
@@ -399,12 +399,12 @@ RunINLA <- function(df_flatfile, df_cellinfo, df_cellmat, out_fname, out_dir, re
   post_omega_1e  <- as.data.frame(inla.tmarginal(function(x) exp( x),   fit_inla_spatial$internal.marginals.hyperpar[['log(Stdev) for idx.eq_const']]))
   post_omega_1as <- as.data.frame(inla.tmarginal(function(x) exp( x),   fit_inla_spatial$internal.marginals.hyperpar[['log(Stdev) for idx.sta_const']]))
   post_omega_1bs <- as.data.frame(inla.tmarginal(function(x) exp(-x/2), fit_inla_spatial$internal.marginals.hyperpar[['Log precision for sta']]))
-  post_omega_2e  <- as.data.frame(inla.tmarginal(function(x) exp( x),   fit_inla_spatial$internal.marginals.hyperpar[['log(Stdev) for idx.eq_gs']]))
+  post_omega_2p  <- as.data.frame(inla.tmarginal(function(x) exp( x),   fit_inla_spatial$internal.marginals.hyperpar[['log(Stdev) for idx.eq_gs']]))
   post_omega_3s  <- as.data.frame(inla.tmarginal(function(x) exp( x),   fit_inla_spatial$internal.marginals.hyperpar[['log(Stdev) for idx.sta_vs30']]))
   #correlation length
   post_ell_1e   <- as.data.frame(inla.tmarginal(function(x) exp( x), fit_inla_spatial$internal.marginals.hyperpar[['log(Range) for idx.eq_const']]))
   post_ell_1as  <- as.data.frame(inla.tmarginal(function(x) exp( x), fit_inla_spatial$internal.marginals.hyperpar[['log(Range) for idx.sta_const']]))
-  post_ell_2e   <- as.data.frame(inla.tmarginal(function(x) exp( x), fit_inla_spatial$internal.marginals.hyperpar[['log(Range) for idx.eq_gs']]))
+  post_ell_2p   <- as.data.frame(inla.tmarginal(function(x) exp( x), fit_inla_spatial$internal.marginals.hyperpar[['log(Range) for idx.eq_gs']]))
   post_ell_3s   <- as.data.frame(inla.tmarginal(function(x) exp( x), fit_inla_spatial$internal.marginals.hyperpar[['log(Range) for idx.sta_vs30']]))
   #cell specific attenuation
   post_omega_cap <- as.data.frame(inla.tmarginal(function(x) exp(-x/2), fit_inla_spatial$internal.marginals.hyperpar[['Log precision for idx_cell']]))
@@ -416,11 +416,11 @@ RunINLA <- function(df_flatfile, df_cellinfo, df_cellmat, out_fname, out_dir, re
   post_omega_1e$y_int  <- cumtrapz(post_omega_1e$x,  post_omega_1e$y)  / trapz(post_omega_1e$x,  post_omega_1e$y)
   post_omega_1as$y_int <- cumtrapz(post_omega_1as$x, post_omega_1as$y) / trapz(post_omega_1as$x, post_omega_1as$y)
   post_omega_1bs$y_int <- cumtrapz(post_omega_1bs$x, post_omega_1bs$y) / trapz(post_omega_1bs$x, post_omega_1bs$y)
-  post_omega_2e$y_int  <- cumtrapz(post_omega_2e$x,  post_omega_2e$y)  / trapz(post_omega_2e$x,  post_omega_2e$y)
+  post_omega_2p$y_int  <- cumtrapz(post_omega_2p$x,  post_omega_2p$y)  / trapz(post_omega_2p$x,  post_omega_2p$y)
   post_omega_3s$y_int  <- cumtrapz(post_omega_3s$x,  post_omega_3s$y)  / trapz(post_omega_3s$x,  post_omega_3s$y)
   post_ell_1e$y_int    <- cumtrapz(post_ell_1e$x,  post_ell_1e$y)      / trapz(post_ell_1e$x,    post_ell_1e$y)
   post_ell_1as$y_int   <- cumtrapz(post_ell_1as$x, post_ell_1as$y)     / trapz(post_ell_1as$x,   post_ell_1as$y)
-  post_ell_2e$y_int    <- cumtrapz(post_ell_2e$x,  post_ell_2e$y)      / trapz(post_ell_2e$x,    post_ell_2e$y)
+  post_ell_2p$y_int    <- cumtrapz(post_ell_2p$x,  post_ell_2p$y)      / trapz(post_ell_2p$x,    post_ell_2p$y)
   post_ell_3s$y_int    <- cumtrapz(post_ell_3s$x,  post_ell_3s$y)      / trapz(post_ell_3s$x,    post_ell_3s$y)
   post_omega_cap$y_int <- cumtrapz(post_omega_cap$x, post_omega_cap$y) / trapz(post_omega_cap$x, post_omega_cap$y)
   
@@ -449,12 +449,12 @@ RunINLA <- function(df_flatfile, df_cellinfo, df_cellmat, out_fname, out_dir, re
     hyp_posterior$ell_1as       <- NaN
     hyp_posterior$ell_1as_pdf   <- NaN
   }
-  if (! all(is.na(post_ell_2e$y_int))){
-    hyp_posterior$ell_2e        <- approx(post_ell_2e$y_int,    post_ell_2e$x,    hyp_posterior$quant)$y
-    hyp_posterior$ell_2e_pdf    <- approx(post_ell_2e$y_int,    post_ell_2e$y,    hyp_posterior$quant)$y
+  if (! all(is.na(post_ell_2p$y_int))){
+    hyp_posterior$ell_2p        <- approx(post_ell_2p$y_int,    post_ell_2p$x,    hyp_posterior$quant)$y
+    hyp_posterior$ell_2p_pdf    <- approx(post_ell_2p$y_int,    post_ell_2p$y,    hyp_posterior$quant)$y
   } else {
-    hyp_posterior$ell_2e        <- NaN
-    hyp_posterior$ell_2e_pdf    <- NaN
+    hyp_posterior$ell_2p        <- NaN
+    hyp_posterior$ell_2p_pdf    <- NaN
   }
   if (! all(is.na(post_ell_3s$y_int))){  
     hyp_posterior$ell_3s       <- approx(post_ell_3s$y_int,   post_ell_3s$x,   hyp_posterior$quant)$y
@@ -484,12 +484,12 @@ RunINLA <- function(df_flatfile, df_cellinfo, df_cellmat, out_fname, out_dir, re
     hyp_posterior$omega_1bs     <- NaN
     hyp_posterior$omega_1bs_pdf <- NaN
   }
-  if (! all(is.na(post_omega_2e$y_int))){  
-    hyp_posterior$omega_2e      <- approx(post_omega_2e$y_int,  post_omega_2e$x,  hyp_posterior$quant)$y
-    hyp_posterior$omega_2e_pdf  <- approx(post_omega_2e$y_int,  post_omega_2e$y,  hyp_posterior$quant)$y
+  if (! all(is.na(post_omega_2p$y_int))){  
+    hyp_posterior$omega_2p      <- approx(post_omega_2p$y_int,  post_omega_2p$x,  hyp_posterior$quant)$y
+    hyp_posterior$omega_2p_pdf  <- approx(post_omega_2p$y_int,  post_omega_2p$y,  hyp_posterior$quant)$y
   } else {
-    hyp_posterior$omega_2e      <- NaN
-    hyp_posterior$omega_2e_pdf  <- NaN
+    hyp_posterior$omega_2p      <- NaN
+    hyp_posterior$omega_2p_pdf  <- NaN
   }
   if (! all(is.na(post_omega_3s$y_int))){  
     hyp_posterior$omega_3s     <- approx(post_omega_3s$y_int, post_omega_3s$x, hyp_posterior$quant)$y
@@ -571,16 +571,16 @@ RunINLA <- function(df_flatfile, df_cellinfo, df_cellmat, out_fname, out_dir, re
   pl_dc_1as_sd_map <- pl_dc_1as_sd_map + geom_path(data=map_ca, aes(x=X,y=Y), color='black') + geom_path(data=map_nv, aes(x=X,y=Y), color='black') +
                       geom_point(data=X_sta, aes(x=staX,y=staY), color=I("black"), size=0.2) +
                       labs(x="X (km)", y="Y (km)") + theme(axis.title = element_text(size=20), axis.text.y = element_text(size=20), axis.text.x = element_text(size=20))
-  #dc_2e map mean
-  pl_dc_2e_mu_map <- ggplot() + theme_bw()
-  pl_dc_2e_mu_map <- plot_field(coeff_2e$mean, mesh, xrange=c(-200,800), yrange=c(3400,4750), pl=pl_dc_2e_mu_map)
-  pl_dc_2e_mu_map <- pl_dc_2e_mu_map + geom_path(data=map_ca, aes(x=X,y=Y), color='black') + geom_path(data=map_nv, aes(x=X,y=Y), color='black') +
+  #dc_2p map mean
+  pl_dc_2p_mu_map <- ggplot() + theme_bw()
+  pl_dc_2p_mu_map <- plot_field(coeff_2p$mean, mesh, xrange=c(-200,800), yrange=c(3400,4750), pl=pl_dc_2p_mu_map)
+  pl_dc_2p_mu_map <- pl_dc_2p_mu_map + geom_path(data=map_ca, aes(x=X,y=Y), color='black') + geom_path(data=map_nv, aes(x=X,y=Y), color='black') +
                      geom_point(data=X_eq, aes(x=eqX,y=eqY), color=I("black"), size=0.4) +
                      labs(x="X (km)", y="Y (km)") + theme(axis.title = element_text(size=20), axis.text.y = element_text(size=20), axis.text.x = element_text(size=20))
-  #dc_2e map sigma
-  pl_dc_2e_sd_map <- ggplot() + theme_bw()
-  pl_dc_2e_sd_map <- plot_field(coeff_2e$sd, mesh, xrange=c(-200,800), yrange=c(3400,4750), pl=pl_dc_2e_sd_map)
-  pl_dc_2e_sd_map <- pl_dc_2e_sd_map + geom_path(data=map_ca, aes(x=X,y=Y), color='black') + geom_path(data=map_nv, aes(x=X,y=Y), color='black') +
+  #dc_2p map sigma
+  pl_dc_2p_sd_map <- ggplot() + theme_bw()
+  pl_dc_2p_sd_map <- plot_field(coeff_2p$sd, mesh, xrange=c(-200,800), yrange=c(3400,4750), pl=pl_dc_2p_sd_map)
+  pl_dc_2p_sd_map <- pl_dc_2p_sd_map + geom_path(data=map_ca, aes(x=X,y=Y), color='black') + geom_path(data=map_nv, aes(x=X,y=Y), color='black') +
                     geom_point(data=X_eq, aes(x=eqX,y=eqY), color=I("black"), size=0.4) +
                     labs(x="X (km)", y="Y (km)") + theme(axis.title = element_text(size=20), axis.text.y = element_text(size=20), axis.text.x = element_text(size=20))
   #dc_3s map mean
@@ -617,10 +617,10 @@ RunINLA <- function(df_flatfile, df_cellinfo, df_cellmat, out_fname, out_dir, re
                        geom_vline(xintercept = hyp_param['omega_1bs','mean'], colour = "red") +
                        labs(x = 'omega_1bs', y = 'posterior', title='Posterior omega_1bs') + 
                        theme(plot.title=element_text(size=20), axis.title=element_text(size=20), axis.text.y=element_text(size=20), axis.text.x=element_text(size=20))
-  #omega_2e
-  pl_omega_2e_post <- ggplot(post_omega_2e, aes(x,y)) + theme_bw() + geom_line() + 
-                      geom_vline(xintercept = hyp_param['omega_2e','mean'], colour = "red") +
-                      labs(x = 'omega_2e', y = 'posterior', title='Posterior omega_2e') + 
+  #omega_2p
+  pl_omega_2p_post <- ggplot(post_omega_2p, aes(x,y)) + theme_bw() + geom_line() + 
+                      geom_vline(xintercept = hyp_param['omega_2p','mean'], colour = "red") +
+                      labs(x = 'omega_2p', y = 'posterior', title='Posterior omega_2p') + 
                       theme(plot.title=element_text(size=20), axis.title=element_text(size=20), axis.text.y=element_text(size=20), axis.text.x=element_text(size=20))
   #omega_3s
   pl_omega_3s_post <- ggplot(post_omega_3s, aes(x,y)) + theme_bw() + geom_line() + 
@@ -637,10 +637,10 @@ RunINLA <- function(df_flatfile, df_cellinfo, df_cellmat, out_fname, out_dir, re
                      geom_vline(xintercept = hyp_param['ell_1as','mean'], colour = "red") +
                      labs(x = 'ell_1as', y = 'posterior', title='Posterior ell_1as') + 
                      theme(plot.title=element_text(size=20), axis.title=element_text(size=20), axis.text.y=element_text(size=20), axis.text.x=element_text(size=20))
-  #ell_2e
-  pl_ell_2e_post <- ggplot(post_ell_2e, aes(x,y)) + theme_bw() + geom_line() + 
-                    geom_vline(xintercept = hyp_param['ell_2e','mean'], colour = "red") +
-                    labs(x = 'ell21e', y = 'posterior', title='Posterior ell_2e') + 
+  #ell_2p
+  pl_ell_2p_post <- ggplot(post_ell_2p, aes(x,y)) + theme_bw() + geom_line() + 
+                    geom_vline(xintercept = hyp_param['ell_2p','mean'], colour = "red") +
+                    labs(x = 'ell2p', y = 'posterior', title='Posterior ell_2p') + 
                     theme(plot.title=element_text(size=20), axis.title=element_text(size=20), axis.text.y=element_text(size=20), axis.text.x=element_text(size=20))
   #ell_3s
   pl_ell_3s_post <- ggplot(post_ell_3s, aes(x,y)) + theme_bw() + geom_line() + 
@@ -676,8 +676,8 @@ RunINLA <- function(df_flatfile, df_cellinfo, df_cellmat, out_fname, out_dir, re
   ggsave(file.path(fig_dir,paste0(out_fname,'_map_dc_1e_sd','.png')),  plot=pl_dc_1e_sd_map,  device='png')
   ggsave(file.path(fig_dir,paste0(out_fname,'_map_dc_1as_mu','.png')), plot=pl_dc_1as_mu_map, device='png')
   ggsave(file.path(fig_dir,paste0(out_fname,'_map_dc_1as_sd','.png')), plot=pl_dc_1as_sd_map, device='png')
-  ggsave(file.path(fig_dir,paste0(out_fname,'_map_dc_2e_mu','.png')),  plot=pl_dc_2e_mu_map,  device='png')
-  ggsave(file.path(fig_dir,paste0(out_fname,'_map_dc_2e_sd','.png')),  plot=pl_dc_2e_sd_map,  device='png')
+  ggsave(file.path(fig_dir,paste0(out_fname,'_map_dc_2p_mu','.png')),  plot=pl_dc_2p_mu_map,  device='png')
+  ggsave(file.path(fig_dir,paste0(out_fname,'_map_dc_2p_sd','.png')),  plot=pl_dc_2p_sd_map,  device='png')
   ggsave(file.path(fig_dir,paste0(out_fname,'_map_dc_3s_mu','.png')),  plot=pl_dc_3s_mu_map,  device='png')
   ggsave(file.path(fig_dir,paste0(out_fname,'_map_dc_3s_sd','.png')),  plot=pl_dc_3s_sd_map,  device='png')
   #posterior distribution
@@ -685,11 +685,11 @@ RunINLA <- function(df_flatfile, df_cellinfo, df_cellmat, out_fname, out_dir, re
   ggsave(file.path(fig_dir,paste0(out_fname,'_post_omega_1e','.png')),   plot=pl_omega_1e_post,  device='png')
   ggsave(file.path(fig_dir,paste0(out_fname,'_post_omega_1as','.png')),  plot=pl_omega_1as_post, device='png')
   ggsave(file.path(fig_dir,paste0(out_fname,'_post_omega_1bs','.png')),  plot=pl_omega_1bs_post, device='png')
-  ggsave(file.path(fig_dir,paste0(out_fname,'_post_omega_2e','.png')),   plot=pl_omega_2e_post,  device='png')
+  ggsave(file.path(fig_dir,paste0(out_fname,'_post_omega_2p','.png')),   plot=pl_omega_2p_post,  device='png')
   ggsave(file.path(fig_dir,paste0(out_fname,'_post_omega_3s','.png')),   plot=pl_omega_3s_post, device='png')
   ggsave(file.path(fig_dir,paste0(out_fname,'_post_ell_1e','.png')),     plot=pl_ell_1e_post,    device='png')
   ggsave(file.path(fig_dir,paste0(out_fname,'_post_ell_1as','.png')),    plot=pl_ell_1as_post,   device='png')
-  ggsave(file.path(fig_dir,paste0(out_fname,'_post_ell_2e','.png')),     plot=pl_ell_2e_post,    device='png')
+  ggsave(file.path(fig_dir,paste0(out_fname,'_post_ell_2p','.png')),     plot=pl_ell_2p_post,    device='png')
   ggsave(file.path(fig_dir,paste0(out_fname,'_post_ell_3s','.png')),     plot=pl_ell_3s_post,    device='png')
   ggsave(file.path(fig_dir,paste0(out_fname,'_post_omega_cap','.png')),  plot=pl_omega_cap_post, device='png')
   

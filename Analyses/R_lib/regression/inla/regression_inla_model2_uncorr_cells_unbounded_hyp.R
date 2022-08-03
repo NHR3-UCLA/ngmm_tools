@@ -212,7 +212,7 @@ RunINLA <- function(df_flatfile, df_cellinfo, df_cellmat, out_fname, out_dir, re
   
   #cell-specific anelastic attenuation
   #---   ---   ---   ---   ---   ---
-  prior_omega_ca <- list(prec = list(prior = 'pc.prec', param = c(0.01, 0.01))) 
+  prior_omega_ca <- list(prec = list(prior = 'pc.prec', param = c(0.01, 0.1))) 
   
   #cell ids
   df_inla_covar$idx_cell <- 1:nrow(df_inla_covar)
@@ -238,7 +238,6 @@ RunINLA <- function(df_flatfile, df_cellinfo, df_cellmat, out_fname, out_dir, re
                                                 idx.sta = idx.sta,
                                                 df_inla_covar),
                                  tag = 'model_inla_spatial')
-  
   #fit inla model
   #---   ---   ---   ---   ---   ---
   if(runinla_flag){
