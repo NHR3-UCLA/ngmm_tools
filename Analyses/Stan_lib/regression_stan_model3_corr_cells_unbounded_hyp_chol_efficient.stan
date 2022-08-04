@@ -95,9 +95,9 @@ parameters {
   real<lower=0.0>  omega_1as;
   real<lower=0.0>  omega_1bs;
   //geometrical spreading and vs30 hyper-parameters
-  real<upper=0.0>  mu_2e;
-  real<lower=0.0>  ell_2e;
-  real<lower=0.0>  omega_2e;
+  real<upper=0.0>  mu_2p;
+  real<lower=0.0>  ell_2p;
+  real<lower=0.0>  omega_2p;
   real             mu_3s;
   real<lower=0.0>  ell_3s;
   real<lower=0.0>  omega_3s;
@@ -113,8 +113,8 @@ parameters {
   //standardized normal variables for spatially correlated coefficients
   vector[NEQ]   z_1e;   
   vector[NSTAT] z_1as;  
-  //spatially varying geometrical spreading
-  vector<upper=0>[NEQ] c_2e;   
+  //standardized normal variable for geometrical spreading
+  vector[NEQ]   z_2p;
   //standardized normal variable for Vs30
   vector[NSTAT] z_3s;  
   //cell-specific attenuation
@@ -128,6 +128,7 @@ transformed parameters{
   //spatially correlated coefficients
   vector[NEQ]   dc_1e;   //spatially varying eq coeff
   vector[NSTAT] dc_1as;  //spatially varying station term
+  vector[NEQ]   c_2p;    //spatially varying geometrical spreading term
   vector[NSTAT] c_3s;    //spatially varying Vs30 term
   
   //spatillay latent variable for event contributions to GP
@@ -165,6 +166,24 @@ transformed parameters{
     }
     L_1as = cholesky_decompose(COV_1as);
     dc_1as = L_1as * z_1as;
+  }
+  
+  //Spatially latent variable for spatially correlated geometrical spreading
+  {
+    matrix[NEQ,NEQ] COV_2p;
+    matrix[NEQ,NEQ] L_2p;
+    for(i in 1:NEQ) {
+      //diagonal terms
+      COV_2p[i,i] = omega_2p^2 + delta;
+      //off-diagonal terms
+      for(j in (i+1):NEQ) {
+        real C_2p = (omega_2p^2 * exp(-dist_e[i,j]/ell_2p));
+        COV_2p[i,j] = C_2p;
+        COV_2p[j,i] = C_2p;
+      }
+    }
+    L_2p = cholesky_decompose(COV_2p);
+    c_2p = mu_2p + L_2p * z_2p;
   }
   
   //Spatially latent variable for vs30 spatially varying term
@@ -206,9 +225,9 @@ model {
   omega_1as ~ exponential(5);
   omega_1bs ~ exponential(5);
   //geometrical and vs30 hyper-parameters
-  ell_2e ~ inv_gamma(2.,50);
+  ell_2p ~ inv_gamma(2.,50);
   ell_3s ~ inv_gamma(2.,50);
-  omega_2e ~ exponential(5);
+  omega_2p ~ exponential(5);
   omega_3s ~ exponential(5);
   //cell specific attenuation hyper-parameters
   ell_ca1p ~ inv_gamma(2.,50);
@@ -228,22 +247,9 @@ model {
   dc_1bs ~ normal(0,omega_1bs);
   
   //constant shift of gs from ergodic coeff
-  mu_2e ~ normal(c_2_erg,0.2);
-  //laten variable for spatially correlated geometrical spreading
-  {
-    matrix[NEQ,NEQ] COV_2e;
-    for(i in 1:NEQ) {
-      //diagonal terms
-      COV_2e[i,i] = omega_2e^2 + delta;
-      //off-diagonal terms
-      for(j in (i+1):NEQ) {
-        real C_2e = (omega_2e^2 * exp(-dist_e[i,j]/ell_2e));
-        COV_2e[i,j] = C_2e;
-        COV_2e[j,i] = C_2e;
-      }
-    }
-    c_2e ~ multi_normal(rep_vector(mu_2e,NEQ),COV_2e);
-  }
+  mu_2p ~ normal(c_2_erg,0.2);
+  //standardized geometrical spreading contributions to GP
+  z_2p ~ std_normal();
   
   //constant shift of Vs30 scaling from ergodic coeff
   mu_3s ~ normal(c_3_erg,0.2);
@@ -272,7 +278,7 @@ model {
   inatten = RC * c_cap;
   
   //Mean non-ergodic including dB
-  rec_nerg_dB = rec_mu + dc_0 + dc_1e[eq] + dc_1as[stat] + dc_1bs[stat] + c_2e[eq].*x_2 + c_3s[stat].*x_3[stat] + inatten + dB[eq];
+  rec_nerg_dB = rec_mu + dc_0 + dc_1e[eq] + dc_1as[stat] + dc_1bs[stat] + c_2p[eq].*x_2 + c_3s[stat].*x_3[stat] + inatten + dB[eq];
   
   Y ~ normal(rec_nerg_dB,phi_0);
 }

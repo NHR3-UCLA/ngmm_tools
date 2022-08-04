@@ -1,8 +1,17 @@
 /*********************************************
-Stan program to obtain VCM parameters
-lower dimensions is used (event terms/station terms)
+Stan program to obtain VCM parameters lower dimensions 
+is used (event terms/station terms/ attenuation coefficient).
 
-This model explicitly estimates the latent event terms and station terms
+This model explicitly estimates the latent event terms, station terms, and
+anelastic attenuation coefficients. 
+This model includes a spatially varying earthquake term, a spatially 
+varying station term, a spatially independent station term, a spatially 
+varying geometrical spreading, a spatially varying Vs30 term, a partially 
+spatially correlated cell-specific anelastic attenuation, and the 
+between and within event residuals. 
+The spatially varying terms are modeled as chelosky decomposition of the
+kernel function multiplied with standard normal variates.
+The cell-path distance matrix is stored in a CSR format
  ********************************************/
 
 data {
@@ -10,7 +19,8 @@ data {
   int NEQ;    // number of earthquakes
   int NSTAT;  // number of stations
   int NCELL;  // number of cells
-    
+  int NCELL_SP; //number of non-zero elements
+      
   //event and station ID
   int<lower=1,upper=NEQ> eq[N];     // event id (in numerical order from 1 to last)
   int<lower=1,upper=NSTAT> stat[N]; // station id (in numerical order from 1 to last)
@@ -34,9 +44,11 @@ data {
   vector[2] X_e[NEQ];   // event coordinates for each record
   vector[2] X_s[NSTAT]; // station coordinates for each record
   vector[2] X_c[NCELL]; //cell coordinates
-    
+  
   //cell distance matrix
-  matrix[N, NCELL] RC;  // cell paths for each record
+  vector[NCELL_SP]    RC_val;  // non-zero values
+  array[NCELL_SP] int RC_w;    // indices
+  array[N+1]      int RC_u;    // row start indices
 }
 
 transformed data {
@@ -45,7 +57,8 @@ transformed data {
   //compute distances
   matrix[NEQ, NEQ] dist_e;
   matrix[NSTAT, NSTAT] dist_s;
-        
+  matrix[NCELL, NCELL] dist_c;
+          
   //compute earthquake distances
   for(i in 1:NEQ) {
     for(j in i:NEQ) {
@@ -61,6 +74,15 @@ transformed data {
       real d_s = distance(X_s[i],X_s[j]);
       dist_s[i,j] = d_s;
       dist_s[j,i] = d_s;
+    }
+  }
+
+  //compute cell distance
+  for(i in 1:NCELL) {
+    for(j in i:NCELL) {
+      real d_c = distance(X_c[i],X_c[j]);
+      dist_c[i,j] = d_c;
+      dist_c[j,i] = d_c;
     }
   }
 }
@@ -85,7 +107,9 @@ parameters {
   real<lower=0.0>  omega_3s;
   //attenuation cells
   real<upper=0.0>  mu_cap;
-  real<lower=0>    omega_cap;      // std of cell-specific attenuation
+  real<lower=0.0>  ell_ca1p;
+  real<lower=0.0>  omega_ca1p; 
+  real<lower=0.0>  omega_ca2p;  
   
   //spatially correlated coefficients
   real dc_0;             //constant shift
@@ -94,7 +118,7 @@ parameters {
   vector[NEQ]   z_1e;   
   vector[NSTAT] z_1as;  
   //standardized normal variable for geometrical spreading
-  vector[NEQ]   z_2p;   
+  vector[NEQ]   z_2p;
   //standardized normal variable for Vs30
   vector[NSTAT] z_3s;  
   //cell-specific attenuation
@@ -107,11 +131,11 @@ parameters {
 transformed parameters{
   //spatially correlated coefficients
   vector[NEQ]   dc_1e;   //spatially varying eq coeff
-  vector[NSTAT] dc_1as;  //zero correlation station term
+  vector[NSTAT] dc_1as;  //spatially varying station term
   vector[NEQ]   c_2p;    //spatially varying geometrical spreading term
   vector[NSTAT] c_3s;    //spatially varying Vs30 term
-    
-  //spatillay latent variable event contributions to GP
+  
+  //spatillay latent variable for event contributions to GP
   {
     matrix[NEQ,NEQ] COV_1e;
     matrix[NEQ,NEQ] L_1e;
@@ -130,7 +154,7 @@ transformed parameters{
   }
 
 
-  //Spatially latent variable station contributions to GP
+  //Spatially latent variable for station contributions to GP
   { 
     matrix[NSTAT,NSTAT] COV_1as;
     matrix[NSTAT,NSTAT] L_1as;
@@ -210,7 +234,9 @@ model {
   omega_2p ~ exponential(5);
   omega_3s ~ exponential(5);
   //cell specific attenuation hyper-parameters
-  omega_cap ~ exponential(100);
+  ell_ca1p ~ inv_gamma(2.,50);
+  omega_ca1p ~ exponential(250);
+  omega_ca2p ~ exponential(250);
   
   //constant shift
   dc_0 ~ normal(0.,0.1);
@@ -233,14 +259,27 @@ model {
   mu_3s ~ normal(c_3_erg,0.2);
   //standardized vs30 contributions to GP
   z_3s ~ std_normal();
-  
-  //mean cell attenuation
-  mu_cap ~ normal(c_a_erg, 0.01); //mean anelastic attenuation
-  //generate latent variables for anelastic attenuation cells 
-  c_cap ~ normal(mu_cap, omega_cap);
 
+  //cell attenuation
+  mu_cap ~ normal(c_a_erg, 0.01); //mean anelastic attenuation
+  //generate latent variables for spatially correlated anelastic attenuation cells
+  {
+    matrix[NCELL, NCELL] COV_cap;
+    for(i in 1:NCELL) {
+      //diagonal terms
+      COV_cap[i,i] = omega_ca1p^2 + omega_ca2p^2 + delta;
+      //off-diagonal terms
+      for(j in (i+1):NCELL) {
+        real C_cap = (omega_ca1p^2 * exp(-dist_c[i,j]/ell_ca1p));  //negative exp cov matrix
+        COV_cap[i,j] = C_cap;
+        COV_cap[j,i] = C_cap;
+      }
+    }
+    c_cap ~ multi_normal(rep_vector(mu_cap,NCELL),COV_cap);
+  }
+    
   //anelastic attenuation
-  inatten = RC * c_cap;
+  inatten = csr_matrix_times_vector(N, NCELL, RC_val, RC_w, RC_u, c_cap); 
   
   //Mean non-ergodic including dB
   rec_nerg_dB = rec_mu + dc_0 + dc_1e[eq] + dc_1as[stat] + dc_1bs[stat] + c_2p[eq].*x_2 + c_3s[stat].*x_3[stat] + inatten + dB[eq];

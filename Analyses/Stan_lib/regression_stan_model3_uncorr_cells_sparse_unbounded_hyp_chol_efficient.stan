@@ -10,7 +10,8 @@ data {
   int NEQ;    // number of earthquakes
   int NSTAT;  // number of stations
   int NCELL;  // number of cells
-    
+  int NCELL_SP; //number of non-zero elements
+      
   //event and station ID
   int<lower=1,upper=NEQ> eq[N];     // event id (in numerical order from 1 to last)
   int<lower=1,upper=NSTAT> stat[N]; // station id (in numerical order from 1 to last)
@@ -36,7 +37,9 @@ data {
   vector[2] X_c[NCELL]; //cell coordinates
     
   //cell distance matrix
-  matrix[N, NCELL] RC;  // cell paths for each record
+  vector[NCELL_SP]    RC_val;  // non-zero values
+  array[NCELL_SP] int RC_w;    // indices
+  array[N+1]      int RC_u;    // row start indices
 }
 
 transformed data {
@@ -85,7 +88,7 @@ parameters {
   real<lower=0.0>  omega_3s;
   //attenuation cells
   real<upper=0.0>  mu_cap;
-  real<lower=0>    omega_cap;      // std of cell-specific attenuation
+  real<lower=0.0>  omega_cap;      // std of cell-specific attenuation
   
   //spatially correlated coefficients
   real dc_0;             //constant shift
@@ -166,6 +169,7 @@ transformed parameters{
     c_2p = mu_2p + L_2p * z_2p;
   }
   
+  
   //Spatially latent variable for vs30 spatially varying term
   { 
     matrix[NSTAT,NSTAT] COV_3s;
@@ -240,7 +244,7 @@ model {
   c_cap ~ normal(mu_cap, omega_cap);
 
   //anelastic attenuation
-  inatten = RC * c_cap;
+  inatten = csr_matrix_times_vector(N, NCELL, RC_val, RC_w, RC_u, c_cap); 
   
   //Mean non-ergodic including dB
   rec_nerg_dB = rec_mu + dc_0 + dc_1e[eq] + dc_1as[stat] + dc_1bs[stat] + c_2p[eq].*x_2 + c_3s[stat].*x_3[stat] + inatten + dB[eq];
