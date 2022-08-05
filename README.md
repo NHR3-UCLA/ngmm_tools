@@ -32,7 +32,8 @@ The ``Raw_files`` includes the files used to construct the synthetic datasets fo
     |     
     |--Raw_files
 
-The syntetic datasets and raw files can be downloaded by running the ``./Data/download_data.sh`` and ``./Raw_files/download_raw_files.sh`` scripts on the terminal.
+An example regression dataset can be downloaded with ``./Data/download_exampfiles.sh``.
+The syntetic datasets and raw metadata can be downloaded by running the ``./Data/download_data.sh`` and ``./Raw_files/download_raw_files.sh`` scripts.
 
 ## Acknowledgments 
 Financial support by the California Department of Transportation and Pacific Gas & Electric Company is greatly appreciated.  
