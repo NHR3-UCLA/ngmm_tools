@@ -7,6 +7,7 @@
 url_syn_ds=https://drive.google.com/drive/folders/1Bh69OmzOvLOEeTfHI8D-MU9HgM0FJEl4?usp=sharing
 
 #download data
+echo "Downloading Synthetic Datasets (7.9 GB) ..."
 sleep 41
 gdown --folder $url_syn_ds
 # Clean verification folder

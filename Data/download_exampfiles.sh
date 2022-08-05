@@ -7,6 +7,7 @@
 url_examp_ds=https://drive.google.com/drive/folders/1mulbkba4tzbk48Bxz1ZH7515aqoKXPxd?usp=sharing
 
 #download data
+echo "Downloading Example Regression Files (1.7 GB) ..."
 sleep 41
 gdown --folder $url_examp_ds
 # Clean verification folder
