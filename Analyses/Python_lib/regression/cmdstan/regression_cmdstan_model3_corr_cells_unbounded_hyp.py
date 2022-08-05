@@ -391,7 +391,8 @@ def RunStan(df_flatfile, df_cellinfo, df_celldist, stan_model_fname,
     pathlib.Path(fig_dir).mkdir(parents=True, exist_ok=True) 
     
     #create stan trace plots
-    stan_az_fit = az.from_cmdstanpy(stan_fit, posterior_predictive='Y')
+    stan_az_fit = az.from_cmdstanpy(stan_fit)
+    # stan_az_fit = az.from_cmdstanpy(stan_fit, posterior_predictive='Y')
     for c_name in col_names_hyp:
         #create trace plot with arviz
         ax = az.plot_trace(stan_az_fit,  var_names=c_name, figsize=(10,5) ).ravel()
