@@ -6,11 +6,11 @@
 # make download_exampfiles # Downloads example regression dataset
 
 download_rawfiles:
-	. ./Raw_files/download_raw_files.sh
+	. ./download_rawfiles.sh
 
 download_synds: download_rawfiles
-	. ./Data/download_data.sh 
+	. ./download_syndata.sh 
 
 download_exampfiles: 
-	. ./Data/download_exampfiles.sh
+	. ./download_exampfiles.sh
 	
