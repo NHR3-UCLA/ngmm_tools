@@ -195,7 +195,7 @@ RunINLA <- function(df_flatfile, df_cellinfo, df_cellmat, out_fname, out_dir, re
 
   #prior distributions
   #site independent term
-  prior_omega_1bs <- list(prec = list(prior = "loggamma", param = c(0.8, 0.5)))
+  prior_omega_1bs <- list(prec = list(prior = "loggamma", param = c(0.9, 0.007)))
   #spde eq prior
   spde_eq <- inla.spde2.pcmatern(mesh = mesh, alpha = alpha, # Mesh and smoothness parameter
                                  prior.range = c(100, 0.95), # P(range < 100) = 0.95

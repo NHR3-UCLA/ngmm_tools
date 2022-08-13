@@ -170,7 +170,7 @@ RunINLA <- function(df_flatfile, out_fname, out_dir, res_name='res',
 
   #prior distributions
   #site independent term
-  prior_omega_1bs <- list(prec = list(prior = "loggamma", param = c(0.8, 0.5)))
+  prior_omega_1bs <- list(prec = list(prior = "loggamma", param = c(0.9, 0.007)))
   #spde earthquake prior
   spde_eq <- inla.spde2.pcmatern(mesh = mesh, alpha = alpha, # Mesh and smoothness parameter
                                  prior.range = c(100, 0.95), # P(range < 100) = 0.95
