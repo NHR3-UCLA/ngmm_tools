@@ -7,6 +7,10 @@ Created on Tue Mar 15 14:50:27 2022
 """
 # Working directory and Packages
 # ---------------------------
+#change working directory
+import os
+os.chdir('/mnt/halcloud_nfs/glavrent/Research/Nonerg_GMM_methodology/Analyses/Code_Verification/regressions/ds1')
+
 #load variables
 import os
 import sys
@@ -75,36 +79,19 @@ def PlotKLCmp(df_KL_all, c_name, fig_fname):
 # Define variables
 # ---------------------------
 # COMPARISONS
-# Different Packages
+# # Different Packages
+# # ---   ---   ---   ---   ---
+# cmp_name  = 'STAN_pckg_cmp_NGAWest2CANorth'
+# reg_title = ['PYSTAN2', 'PYSTAN3', 'CMDSTANPY']
+# reg_fname = ['PYSTAN_NGAWest2CANorth_chol_eff_small_corr_len','PYSTAN3_NGAWest2CANorth_chol_eff_small_corr_len','CMDSTAN_NGAWest2CANorth_chol_eff_small_corr_len']
+# ylim_time = [0, 700]
+# Different Implementations
 # ---   ---   ---   ---   ---
-cmp_name  = 'STAN_pckg_cmp_NGAWest2CANorth'
-reg_title = ['PYSTAN2', 'PYSTAN3', 'CMDSTANPY']
-reg_fname = ['PYSTAN_NGAWest2CANorth_chol_eff_small_corr_len','PYSTAN3_NGAWest2CANorth_chol_eff_small_corr_len','CMDSTAN_NGAWest2CANorth_chol_eff_small_corr_len']
+cmp_name  = 'STAN_impl_cmp_NGAWest2CANorth'
+reg_title = ['CMDSTANPY Chol.', 'CMDSTANPY Chol. Eff.']
+reg_fname = ['CMDSTAN_NGAWest2CANorth_chol_small_corr_len','CMDSTAN_NGAWest2CANorth_chol_eff_small_corr_len']
+# reg_fname = ['PYSTAN_NGAWest2CANorth_chol_small_corr_len','PYSTAN_NGAWest2CANorth_chol_eff_small_corr_len']
 ylim_time = [0, 700]
-# # Different Implementations
-# # ---   ---   ---   ---   ---
-# cmp_name  = 'STAN_impl_cmp_NGAWest2CANorth'
-# reg_title = ['CMDSTANPY Chol.', 'CMDSTANPY Chol. Eff.']
-# reg_fname = ['CMDSTAN_NGAWest2CANorth_chol_small_corr_len','CMDSTAN_NGAWest2CANorth_chol_eff_small_corr_len']
-# ylim_time = [0, 700]
-# # Different Software
-# # ---   ---   ---   ---   ---
-# cmp_name  = 'STAN_vs_INLA_cmp_NGAWest2CANorth'
-# reg_title = ['STAN','INLA']
-# reg_fname = ['CMDSTAN_NGAWest2CANorth_chol_eff_small_corr_len','INLA_NGAWest2CANorth_coarse_small_corr_len']
-# ylim_time = [0, 700]
-# Different 
-# ---   ---   ---   ---   ---
-# # NGAWest2CANorth
-# cmp_name  = 'INLA_mesh_cmp_NGAWest2CANorth'
-# reg_title = ['INLA coarse mesh', 'INLA medium mesh', 'INLA fine mesh']
-# reg_fname = ['INLA_NGAWest2CANorth_coarse_small_corr_len','INLA_NGAWest2CANorth_medium_small_corr_len','INLA_NGAWest2CANorth_fine_small_corr_len']
-# ylim_time = [0, 20]
-# # NGAWest2CANorth
-# cmp_name  = 'INLA_mesh_cmp_NGAWest3CA'
-# reg_title = ['INLA coarse mesh', 'INLA medium mesh', 'INLA fine mesh']
-# reg_fname = ['INLA_NGAWest3CA_coarse_small_corr_len','INLA_NGAWest3CA_medium_small_corr_len','INLA_NGAWest3CA_fine_small_corr_len']
-# ylim_time = [0, 100]
 
 #directories regressions
 reg_dir = [f'../../../../Data/Verification/regression/ds1/%s/'%r_f for r_f in reg_fname]
@@ -198,7 +185,7 @@ fig_fname = '%s/%s_%s_KLdiv'%(dir_out, cmp_name, c_name)
 PlotKLCmp(df_sum_misfit_all , c_name, fig_fname);
 
 
-# Run Time
+# RMSE divergence
 # ---   ---   ---   ---   ---
 #run time figure
 fig_fname = '%s/%s_run_time'%(dir_out, cmp_name)
@@ -221,7 +208,6 @@ ax.tick_params(axis='x', labelsize=32)
 ax.tick_params(axis='y', labelsize=32)
 #legend
 ax.legend(loc='lower left', fontsize=32)
-# ax.legend(loc='upper left', fontsize=32)
 # ax.legend(loc='center left', bbox_to_anchor=(1, 0.5),  fontsize=25)
 #save figure
 fig.tight_layout()

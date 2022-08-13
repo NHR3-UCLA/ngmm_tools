@@ -21,11 +21,11 @@ from regression_cmdstan_model2_corr_cells_sparse_unbounded_hyp import RunStan
 # Define variables
 # ---------------------------
 #filename suffix
-synds_suffix = '_small_corr_len' 
+# synds_suffix = '_small_corr_len' 
 # synds_suffix = '_large_corr_len'
 
 #synthetic datasets directory
-ds_dir = '../../../../Data/Validation/synthetic_datasets/ds2'
+ds_dir = '../../../../Data/Verification/synthetic_datasets/ds2'
 ds_dir = r'%s%s/'%(ds_dir, synds_suffix)
 
 # dataset info 
@@ -41,19 +41,19 @@ ds_fname_celldist = 'CatalogNGAWest3CALite_distancematrix'
 # sm_fname = '../../../Stan_lib/regression_stan_model2_corr_cells_unbounded_hyp_chol.stan'
 # sm_fname = '../../../Stan_lib/regression_stan_model2_corr_cells_unbounded_hyp_chol_efficient.stan'
 # sm_fname = '../../../Stan_lib/regression_stan_model2_corr_cells_unbounded_hyp_chol_efficient2.stan'
-sm_fname = '../../../Stan_lib/regression_stan_model2_corr_cells_sparse_unbounded_hyp_chol_efficient.stan'
+# sm_fname = '../../../Stan_lib/regression_stan_model2_corr_cells_sparse_unbounded_hyp_chol_efficient.stan'
 
 #output info
 #main output filename
 out_fname_main = 'NGAWest3CA_syndata'
 #main output directory
-out_dir_main   = '../../../../Data/Validation/regression/ds2/'
+out_dir_main   = '../../../../Data/Verification/regression/ds2/'
 #output sub-directory
 # out_dir_sub    = 'CMDSTAN_NGAWest3CA_corr_cells'
 # out_dir_sub    = 'CMDSTAN_NGAWest3CA_corr_cells_chol'
 # out_dir_sub    = 'CMDSTAN_NGAWest3CA_corr_cells_chol_efficient'
 # out_dir_sub    = 'CMDSTAN_NGAWest3CA_corr_cells_chol_efficient2'
-out_dir_sub    = 'CMDSTAN_NGAWest3CA_corr_cells_chol_efficient_sp'
+# out_dir_sub    = 'CMDSTAN_NGAWest3CA_corr_cells_chol_efficient_sp'
 
 #stan parameters
 res_name = 'tot'

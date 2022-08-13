@@ -23,11 +23,15 @@ def PlotRSMCmp(df_rms_all, c_name, fig_fname):
     
     #create figure axes
     fig, ax = plt.subplots(figsize = (10,10))
+    ltype_array = ['-','--',':']
     
-    for k in df_rms_all:
+    for j, k in enumerate(df_rms_all):
         df_rms = df_rms_all[k]
         ds_id = np.array(range(len(df_rms)))
-        ax.plot(ds_id, df_rms.loc[:,c_name+'_rms'], linestyle='-', marker='o', linewidth=2, markersize=10, label=k)
+        #plot info
+        lcol  = mpl.cm.get_cmap('tab10')( np.floor_divide(j,3) )
+        ltype = ltype_array[ np.mod(j,3) ]
+        ax.plot(ds_id, df_rms.loc[:,c_name+'_rms'], marker='o', linewidth=2, markersize=10, label=k,  linestyle=ltype, color=lcol)
     #figure properties
     ax.set_ylim([0, max(0.50, max(ax.get_ylim()))])
     ax.set_xlabel('synthetic dataset', fontsize=35)
@@ -38,7 +42,7 @@ def PlotRSMCmp(df_rms_all, c_name, fig_fname):
     ax.tick_params(axis='x', labelsize=32)
     ax.tick_params(axis='y', labelsize=32)
     #legend
-    ax.legend(loc='upper left', fontsize=32)
+    # ax.legend(loc='upper left', fontsize=32)
     #save figure
     fig.tight_layout()
     fig.savefig( fig_fname + '.png' )
@@ -64,7 +68,8 @@ def PlotKLCmp(df_KL_all, c_name, fig_fname):
     ax.tick_params(axis='x', labelsize=32)
     ax.tick_params(axis='y', labelsize=32)
     #legend
-    ax.legend(loc='upper left', fontsize=32)
+    # ax.legend(loc='upper left', fontsize=32)
+    # ax.legend(loc='center left', bbox_to_anchor=(1, 0.5),  fontsize=25)
     #save figure
     fig.tight_layout()
     fig.savefig( fig_fname + '.png' )
@@ -75,12 +80,16 @@ def PlotKLCmp(df_KL_all, c_name, fig_fname):
 # Define variables
 # ---------------------------
 # COMPARISONS
-# Different Packages
+# Different Mesh sizes 
 # ---   ---   ---   ---   ---
-cmp_name  = 'STAN_pckg_cmp_NGAWest2CANorth'
-reg_title = ['PYSTAN2', 'PYSTAN3', 'CMDSTANPY']
-reg_fname = ['PYSTAN_NGAWest2CANorth_chol_eff_small_corr_len','PYSTAN3_NGAWest2CANorth_chol_eff_small_corr_len','CMDSTAN_NGAWest2CANorth_chol_eff_small_corr_len']
-ylim_time = [0, 700]
+cmp_name  = 'INLA_mesh'
+reg_title = [f'NGAW3* CA\nfine',       f'NGAW3* CA \nmedium',      f'NGAW3 CA \ncoarse',
+             f'NGAW2 CA \nfine',       f'NGAW2 CA \nmedium',       f'NGAW2 CA \ncoarse',
+             f'NGAW2 CA, North\nfine', f'NGAW2 CA, North\nmedium', f'NGAW2 CA, North\ncoarse']
+reg_fname = ['INLA_NGAWest3CA_fine_small_corr_len',     'INLA_NGAWest3CA_medium_small_corr_len',     'INLA_NGAWest3CA_coarse_small_corr_len',
+             'INLA_NGAWest2CA_fine_small_corr_len',     'INLA_NGAWest2CA_medium_small_corr_len',     'INLA_NGAWest2CA_coarse_small_corr_len', 
+             'INLA_NGAWest2CANorth_fine_small_corr_len','INLA_NGAWest2CANorth_medium_small_corr_len','INLA_NGAWest2CANorth_coarse_small_corr_len']
+ylim_time = [0, 50]
 # # Different Implementations
 # # ---   ---   ---   ---   ---
 # cmp_name  = 'STAN_impl_cmp_NGAWest2CANorth'
@@ -131,6 +140,8 @@ for k, (r_t, r_d) in enumerate(zip(reg_title, reg_dir)):
     fname_runinfo = r_d + '/run_info.csv'
     #store calc time
     df_runinfo_all[r_t] = pd.read_csv(fname_runinfo)
+    #
+    print(f'%s: %.1f min'%( r_t, df_runinfo_all[r_t].run_time.mean() ))
 
 
 # Comparison Figures
@@ -203,13 +214,17 @@ PlotKLCmp(df_sum_misfit_all , c_name, fig_fname);
 #run time figure
 fig_fname = '%s/%s_run_time'%(dir_out, cmp_name)
 #create figure axes
-fig, ax = plt.subplots(figsize = (10,10))
+# fig, ax = plt.subplots(figsize = (10,10))
+fig, ax = plt.subplots(figsize = (14,10))
+ltype_array = ['-','--',':']
 #iterate over different analyses
 for j, k in enumerate(df_runinfo_all):
     ds_id   = df_runinfo_all[k].ds_id
     ds_name = ['Y%i'%d_i for d_i in ds_id]
     run_time = df_runinfo_all[k].run_time
-    ax.plot(ds_id, run_time, marker='o', linewidth=2, markersize=10, label=k)
+    lcol  = mpl.cm.get_cmap('tab10')( np.floor_divide(j,3) )
+    ltype = ltype_array[ np.mod(j,3) ]
+    ax.plot(ds_id, run_time, marker='o', linewidth=2, markersize=10, label=k, linestyle=ltype, color=lcol)
 #figure properties
 ax.set_ylim(ylim_time)
 ax.set_xlabel('synthetic dataset', fontsize=35)
@@ -220,9 +235,9 @@ ax.set_xticklabels(labels=ds_name)
 ax.tick_params(axis='x', labelsize=32)
 ax.tick_params(axis='y', labelsize=32)
 #legend
-ax.legend(loc='lower left', fontsize=32)
+# ax.legend(loc='lower left', fontsize=32)
 # ax.legend(loc='upper left', fontsize=32)
-# ax.legend(loc='center left', bbox_to_anchor=(1, 0.5),  fontsize=25)
+ax.legend(loc='center left', bbox_to_anchor=(1, 0.5),  fontsize=25)
 #save figure
 fig.tight_layout()
 fig.savefig( fig_fname + '.png' )

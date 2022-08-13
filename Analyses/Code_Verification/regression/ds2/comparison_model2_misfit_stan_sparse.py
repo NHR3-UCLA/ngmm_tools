@@ -24,10 +24,12 @@ def PlotRSMCmp(df_rms_all, c_name, fig_fname):
     #create figure axes
     fig, ax = plt.subplots(figsize = (10,10))
     
-    for k in df_rms_all:
+    for j, k in enumerate(df_rms_all):
         df_rms = df_rms_all[k]
         ds_id = np.array(range(len(df_rms)))
-        ax.plot(ds_id, df_rms.loc[:,c_name+'_rms'], linestyle='-', marker='o', linewidth=2, markersize=10, label=k)
+        lcol  = mpl.cm.get_cmap('tab10')(0) if j in [0,2] else mpl.cm.get_cmap('tab10')(1)
+        ltype = '-' if j in [0,1] else '--'
+        ax.plot(ds_id, df_rms.loc[:,c_name+'_rms'], marker='o', linewidth=2, markersize=10, label=k,  linestyle=ltype, color=lcol)
     #figure properties
     ax.set_ylim([0, max(0.50, max(ax.get_ylim()))])
     ax.set_xlabel('synthetic dataset', fontsize=35)
@@ -74,43 +76,42 @@ def PlotKLCmp(df_KL_all, c_name, fig_fname):
 
 # Define variables
 # ---------------------------
-# COMPARISONS
-# Different Packages
-# ---   ---   ---   ---   ---
-cmp_name  = 'STAN_pckg_cmp_NGAWest2CANorth'
-reg_title = ['PYSTAN2', 'PYSTAN3', 'CMDSTANPY']
-reg_fname = ['PYSTAN_NGAWest2CANorth_chol_eff_small_corr_len','PYSTAN3_NGAWest2CANorth_chol_eff_small_corr_len','CMDSTAN_NGAWest2CANorth_chol_eff_small_corr_len']
-ylim_time = [0, 700]
-# # Different Implementations
+# # Sparse Distance Matrix
 # # ---   ---   ---   ---   ---
-# cmp_name  = 'STAN_impl_cmp_NGAWest2CANorth'
-# reg_title = ['CMDSTANPY Chol.', 'CMDSTANPY Chol. Eff.']
-# reg_fname = ['CMDSTAN_NGAWest2CANorth_chol_small_corr_len','CMDSTAN_NGAWest2CANorth_chol_eff_small_corr_len']
-# ylim_time = [0, 700]
+# # NGAWest 2 CA North
+# cmp_name  = 'STAN_sparse_cmp_NGAWest2CA'
+# reg_title = ['STAN','STAN w/ sp dist matrix']
+# reg_fname = ['CMDSTAN_NGAWest2CANorth_corr_cells_chol_eff_small_corr_len','CMDSTAN_NGAWest2CANorth_corr_cells_chol_eff_sp_small_corr_len']
+# ylim_time = [0, 800]
+# NGAWest 2 CA
+cmp_name  = 'STAN_sparse_cmp_NGAWest2CA'
+reg_title = ['STAN','STAN w/ sp dist matrix']
+reg_fname = ['CMDSTAN_NGAWest2CA_corr_cells_chol_eff_small_corr_len','CMDSTAN_NGAWest2CA_corr_cells_chol_eff_sp_small_corr_len']
+ylim_time = [0, 7000]
+# NGAWest 2 CA & NGAWest 2 CA North
+cmp_name  = 'STAN_sparse_cmp_NGAWest2CA_'
+reg_title = ['STAN - NGAW2 CA','STAN - NGAW2 CA North',
+             'STAN - NGAW2 CA\nw/ sp dist matrix',f'STAN NGAW2 CA North\nw/ sp dist matrix, ']
+reg_fname = ['CMDSTAN_NGAWest2CA_corr_cells_chol_eff_small_corr_len',    'CMDSTAN_NGAWest2CANorth_corr_cells_chol_eff_small_corr_len',
+             'CMDSTAN_NGAWest2CA_corr_cells_chol_eff_sp_small_corr_len', 'CMDSTAN_NGAWest2CANorth_corr_cells_chol_eff_sp_small_corr_len']
+ylim_time = [0, 7000]
+
 # # Different Software
 # # ---   ---   ---   ---   ---
 # cmp_name  = 'STAN_vs_INLA_cmp_NGAWest2CANorth'
-# reg_title = ['STAN','INLA']
-# reg_fname = ['CMDSTAN_NGAWest2CANorth_chol_eff_small_corr_len','INLA_NGAWest2CANorth_coarse_small_corr_len']
-# ylim_time = [0, 700]
-# Different 
-# ---   ---   ---   ---   ---
-# # NGAWest2CANorth
-# cmp_name  = 'INLA_mesh_cmp_NGAWest2CANorth'
-# reg_title = ['INLA coarse mesh', 'INLA medium mesh', 'INLA fine mesh']
-# reg_fname = ['INLA_NGAWest2CANorth_coarse_small_corr_len','INLA_NGAWest2CANorth_medium_small_corr_len','INLA_NGAWest2CANorth_fine_small_corr_len']
-# ylim_time = [0, 20]
-# # NGAWest2CANorth
-# cmp_name  = 'INLA_mesh_cmp_NGAWest3CA'
-# reg_title = ['INLA coarse mesh', 'INLA medium mesh', 'INLA fine mesh']
-# reg_fname = ['INLA_NGAWest3CA_coarse_small_corr_len','INLA_NGAWest3CA_medium_small_corr_len','INLA_NGAWest3CA_fine_small_corr_len']
-# ylim_time = [0, 100]
+# reg_title = ['STAN corr. cells','STAN uncorr. cells','INLA uncorr. cells']
+# reg_fname = ['CMDSTAN_NGAWest2CANorth_corr_cells_chol_eff_small_corr_len','CMDSTAN_NGAWest2CANorth_corr_cells_chol_eff_small_corr_len',
+#              'INLA_NGAWest2CANorth_uncorr_cells_coarse_small_corr_len']
+# reg_fname = ['PYSTAN_NGAWest2CANorth_corr_cells_chol_eff_small_corr_len','PYSTAN_NGAWest2CANorth_uncorr_cells_chol_eff_small_corr_len',
+#              'INLA_NGAWest2CANorth_uncorr_cells_coarse_small_corr_len']
+# ylim_time = [0, 800]
+
 
 #directories regressions
-reg_dir = [f'../../../../Data/Verification/regression/ds1/%s/'%r_f for r_f in reg_fname]
+reg_dir = [f'../../../../Data/Verification/regression/ds2/%s/'%r_f for r_f in reg_fname]
 
 #directory output
-dir_out = '../../../../Data/Verification/regression/ds1/comparisons/'
+dir_out = '../../../../Data/Verification/regression/ds2/comparisons/'
 
 # Load Data
 # ---------------------------           
@@ -209,7 +210,10 @@ for j, k in enumerate(df_runinfo_all):
     ds_id   = df_runinfo_all[k].ds_id
     ds_name = ['Y%i'%d_i for d_i in ds_id]
     run_time = df_runinfo_all[k].run_time
-    ax.plot(ds_id, run_time, marker='o', linewidth=2, markersize=10, label=k)
+    #
+    lcol  = mpl.cm.get_cmap('tab10')(0) if j in [0,2] else mpl.cm.get_cmap('tab10')(1)
+    ltype = '-' if j in [0,1] else '--'
+    ax.plot(ds_id, run_time, marker='o', linewidth=2, markersize=10, label=k, linestyle=ltype, color=lcol)
 #figure properties
 ax.set_ylim(ylim_time)
 ax.set_xlabel('synthetic dataset', fontsize=35)
@@ -220,7 +224,7 @@ ax.set_xticklabels(labels=ds_name)
 ax.tick_params(axis='x', labelsize=32)
 ax.tick_params(axis='y', labelsize=32)
 #legend
-ax.legend(loc='lower left', fontsize=32)
+# ax.legend(loc='lower left', fontsize=32)
 # ax.legend(loc='upper left', fontsize=32)
 # ax.legend(loc='center left', bbox_to_anchor=(1, 0.5),  fontsize=25)
 #save figure

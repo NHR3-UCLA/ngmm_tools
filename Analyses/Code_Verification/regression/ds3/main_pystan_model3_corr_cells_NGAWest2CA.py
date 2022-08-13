@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Wed Dec 29 15:16:15 2021
+Created on Wed Jul 14 14:17:52 2021
 
 @author: glavrent
 """
@@ -14,9 +14,9 @@ import numpy as np
 import pandas as pd
 import time
 #user functions
-sys.path.insert(0,'../../../Python_lib/regression/cmdstan/')
-# from regression_cmdstan_model2_uncorr_cells_unbounded_hyp import RunStan
-from regression_cmdstan_model2_uncorr_cells_sparse_unbounded_hyp import RunStan
+sys.path.insert(0,'../../../Python_lib/regression/pystan/')
+from regression_pystan_model3_corr_cells_unbounded_hyp import RunStan
+
 
 # Define variables
 # ---------------------------
@@ -25,7 +25,7 @@ from regression_cmdstan_model2_uncorr_cells_sparse_unbounded_hyp import RunStan
 # synds_suffix = '_large_corr_len'
 
 #synthetic datasets directory
-ds_dir = '../../../../Data/Verification/synthetic_datasets/ds2'
+ds_dir = '../../../../Data/Validation/synthetic_datasets/ds3'
 ds_dir = r'%s%s/'%(ds_dir, synds_suffix)
 
 # dataset info 
@@ -37,32 +37,28 @@ ds_fname_cellinfo = 'CatalogNGAWest3CALite_cellinfo'
 ds_fname_celldist = 'CatalogNGAWest3CALite_distancematrix'
 
 #stan model 
-# sm_fname = '../../../Stan_lib/regression_stan_model2_uncorr_cells_unbounded_hyp.stan'
-# sm_fname = '../../../Stan_lib/regression_stan_model2_uncorr_cells_unbounded_hyp_chol.stan'
-# sm_fname = '../../../Stan_lib/regression_stan_model2_uncorr_cells_unbounded_hyp_chol_efficient.stan'
-# sm_fname = '../../../Stan_lib/regression_stan_model2_uncorr_cells_unbounded_hyp_chol_efficient2.stan'
-# sm_fname = '../../../Stan_lib/regression_stan_model2_uncorr_cells_sparse_unbounded_hyp_chol_efficient.stan'
+sm_fname = '../../../Stan_lib/regression_stan_model3_corr_cells_unbounded_hyp_chol_efficient.stan'
 
 #output info
 #main output filename
-out_fname_main = 'NGAWest3CA_syndata'
+out_fname_main = 'NGAWest2CA_syndata'
 #main output directory
-out_dir_main   = '../../../../Data/Verification/regression/ds2/'
+out_dir_main   = '../../../../Data/Validation/regression/ds3/'
 #output sub-directory
-# out_dir_sub    = 'CMDSTAN_NGAWest3CA_uncorr_cells'
-# out_dir_sub    = 'CMDSTAN_NGAWest3CA_uncorr_cells_chol'
-# out_dir_sub    = 'CMDSTAN_NGAWest3CA_uncorr_cells_chol_eff'
-# out_dir_sub    = 'CMDSTAN_NGAWest3CA_uncorr_cells_chol_eff2'
-# out_dir_sub    = 'CMDSTAN_NGAWest3CA_uncorr_cells_chol_eff_sp'
+out_dir_sub    = 'PYSTAN_NGAWest2CA_corr_cells_chol_eff'
 
 #stan parameters
+runstan_flag = True
+# pystan_ver = 2
+pystan_ver = 3
 res_name = 'tot'
-n_iter_warmup   = 500
-n_iter_sampling = 500
-n_chains        = 4
-adapt_delta     = 0.8
-max_treedepth   = 10
+n_iter = 1000
+n_chains = 4
+adapt_delta   = 0.8
+max_treedepth = 10
 #ergodic coefficients
+c_2_erg=-2.0
+c_3_erg=-0.6
 c_a_erg=0.0
 #parallel options
 # flag_parallel = True
@@ -91,6 +87,8 @@ for d_id in ds_id:
     ds_fname = '%s%s%s_Y%i.csv'%(ds_dir, ds_fname_main, synds_suffix, d_id)
     #load flatfile
     df_flatfile = pd.read_csv(ds_fname)
+    #keep only NGAWest2 records
+    df_flatfile = df_flatfile.loc[df_flatfile.dsid==0,:]
     
     #output file name and directory
     out_fname = '%s%s_Y%i'%(out_fname_main, synds_suffix, d_id)
@@ -98,10 +96,11 @@ for d_id in ds_id:
 
     #run stan model
     RunStan(df_flatfile, df_cellinfo, df_celldist, sm_fname, 
-            out_fname, out_dir, res_name, c_a_erg=c_a_erg, 
-            n_iter_warmup=n_iter_warmup, n_iter_sampling=n_iter_sampling, n_chains=n_chains,
+            out_fname, out_dir, res_name, 
+            c_2_erg=c_2_erg, c_3_erg=c_3_erg, c_a_erg=c_a_erg, 
+            runstan_flag=runstan_flag, n_iter=n_iter, n_chains=n_chains,
             adapt_delta=adapt_delta, max_treedepth=max_treedepth,
-            stan_parallel=flag_parallel)
+            pystan_ver=pystan_ver, pystan_parallel=flag_parallel)
        
     #run time end
     run_t_end = time.time()

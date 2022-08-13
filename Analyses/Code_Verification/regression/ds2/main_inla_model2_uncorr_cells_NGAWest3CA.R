@@ -36,17 +36,24 @@ ds_id <- seq(1,5)
 
 #output info
 #main output filename
-out_fname_main <- 'NGAWest3CA_syndata'
+out_fname_main <- 'NGAWest2CA_syndata'
 #main output directory
 out_dir_main   <- 'Data/Verification/regression/ds2'
 #output sub-directory
-# out_dir_sub    <- 'INLA_NGAWest3CA_uncorr_cells'
+# out_dir_sub    <- 'INLA_NGAWest2CA_uncorr_cells'
+#matern kernel function (nu=2)
 # out_dir_sub    <- 'INLA_NGAWest3CA_uncorr_cells_fine'
 # out_dir_sub    <- 'INLA_NGAWest3CA_uncorr_cells_medium'
 # out_dir_sub    <- 'INLA_NGAWest3CA_uncorr_cells_coarse'
+#exponential kernel function
+# out_dir_sub    <- 'INLA_NGAWest3CA_uncorr_cells_fine_nexp'
+# out_dir_sub    <- 'INLA_NGAWest3CA_uncorr_cells_medium_nexp'
+# out_dir_sub    <- 'INLA_NGAWest3CA_uncorr_cells_coarse_nexp'
 
 #inla parameters
 runinla_flag <- TRUE # TRUE or FALSE
+# alpha        <- 2   #matern kernel function nu=2
+# alpha        <- 3/2 #negative exponential kernel function
 res_name     <- 'tot'
 num_threads   <- 10
 

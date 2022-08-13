@@ -87,11 +87,25 @@ reg_title = ['STAN','STAN w/ sp dist matrix']
 reg_fname = ['CMDSTAN_NGAWest2CA_corr_cells_chol_eff_small_corr_len','CMDSTAN_NGAWest2CA_corr_cells_chol_eff_sp_small_corr_len']
 ylim_time = [0, 7000]
 
+
+# # Different Software
+# # ---   ---   ---   ---   ---
+# cmp_name  = 'STAN_vs_INLA_cmp_NGAWest2CANorth'
+# reg_title = ['STAN corr. cells','STAN uncorr. cells','INLA uncorr. cells']
+# reg_fname = ['CMDSTAN_NGAWest2CANorth_corr_cells_chol_eff_small_corr_len','CMDSTAN_NGAWest2CANorth_corr_cells_chol_eff_small_corr_len',
+#              'INLA_NGAWest2CANorth_uncorr_cells_coarse_small_corr_len']
+# reg_fname = ['PYSTAN_NGAWest2CANorth_corr_cells_chol_eff_small_corr_len','PYSTAN_NGAWest2CANorth_uncorr_cells_chol_eff_small_corr_len',
+#              'INLA_NGAWest2CANorth_uncorr_cells_coarse_small_corr_len']
+# ylim_time = [0, 800]
+
+
 #directories regressions
-reg_dir = [f'../../../../Data/Verification/regression/ds2/%s/'%r_f for r_f in reg_fname]
+# reg_dir = [f'../../../../Data/Verification/regression/ds2/%s/'%r_f for r_f in reg_fname]
+reg_dir = [f'../../../../Data/Verification/regression_old/ds2/%s/'%r_f for r_f in reg_fname]
 
 #directory output
-dir_out = '../../../../Data/Verification/regression/ds2/comparisons/'
+# dir_out = '../../../../Data/Verification/regression/ds2/comparisons/'
+dir_out = '../../../../Data/Verification/regression_old/ds2/comparisons/'
 
 # Load Data
 # ---------------------------           

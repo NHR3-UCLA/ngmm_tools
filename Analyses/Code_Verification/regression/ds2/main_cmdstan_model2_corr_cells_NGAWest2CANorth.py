@@ -21,7 +21,7 @@ from regression_cmdstan_model2_corr_cells_sparse_unbounded_hyp import RunStan
 # Define variables
 # ---------------------------
 #filename suffix
-synds_suffix = '_small_corr_len' 
+# synds_suffix = '_small_corr_len' 
 # synds_suffix = '_large_corr_len'
 
 #synthetic datasets directory
@@ -41,7 +41,7 @@ ds_fname_celldist = 'CatalogNGAWest3CALite_distancematrix'
 # sm_fname = '../../../Stan_lib/regression_stan_model2_corr_cells_unbounded_hyp_chol.stan'
 # sm_fname = '../../../Stan_lib/regression_stan_model2_corr_cells_unbounded_hyp_chol_efficient.stan'
 # sm_fname = '../../../Stan_lib/regression_stan_model2_corr_cells_unbounded_hyp_chol_efficient2.stan'
-sm_fname = '../../../Stan_lib/regression_stan_model2_corr_cells_sparse_unbounded_hyp_chol_efficient.stan'
+# sm_fname = '../../../Stan_lib/regression_stan_model2_corr_cells_sparse_unbounded_hyp_chol_efficient.stan'
 
 #output info
 #main output filename
@@ -53,7 +53,7 @@ out_dir_main   = '../../../../Data/Verification/regression/ds2/'
 # out_dir_sub    = 'CMDSTAN_NGAWest2CANorth_corr_cells_chol'
 # out_dir_sub    = 'CMDSTAN_NGAWest2CANorth_corr_cells_chol_eff'
 # out_dir_sub    = 'CMDSTAN_NGAWest2CANorth_corr_cells_chol_eff2'
-out_dir_sub    = 'CMDSTAN_NGAWest2CANorth_corr_cells_chol_eff_sp'
+# out_dir_sub    = 'CMDSTAN_NGAWest2CANorth_corr_cells_chol_eff_sp'
 
 #stan parameters
 res_name = 'tot'

@@ -34,7 +34,7 @@ from pylib_stats import CalcLKDivergece
 # ++++++++++++++++++++++++++++++++++++++++
 #processed dataset
 # name_dataset = 'NGAWest2CANorth'
-name_dataset  = 'NGAWest2CA'
+# name_dataset  = 'NGAWest2CA'
 # name_dataset  = 'NGAWest3CA'
 
 #correlation info
@@ -42,76 +42,39 @@ name_dataset  = 'NGAWest2CA'
 # 2: Large Correlation Lenghts
 corr_id = 1
 
-#package
-# 1: Pystan v2
-# 2: Pystan v3
-# 3: stancmd
-pkg_id = 1
+#kernel function 
+# 1: Mattern kernel (alpha=2)
+# 2: Negative Exp   (alpha=3/2)
+ker_id = 1
 
-#approximation type
-# 1: multivariate normal
-# 2: cholesky 
-# 3: cholesky efficient 
-# 4: cholesky efficient v2
-# 5: cholesky efficient, sparse cells
-aprox_id = 3
+#mesh type
+# 1: Fine Mesh
+# 2: Medium Mesh
+# 3: Coarse Mesh
+mesh_id = 3
 
 #directories (synthetic dataset)
 if corr_id == 1:
-    dir_syndata = '../../../../Data/Verification/synthetic_datasets/ds2_small_corr_len'
+    dir_syndata = '../../../../Data/Verification/synthetic_datasets/ds3_small_corr_len'  
 elif corr_id == 2:
-    dir_syndata = '../../../../Data/Verification/synthetic_datasets/ds2_large_corr_len'
-
+    dir_syndata = '../../../../Data/Verification/synthetic_datasets/ds3_large_corr_len'    
+#directories (regression results)    
+if mesh_id == 1:
+    dir_results = f'../../../../Data/Verification/regression/ds3/INLA_%s_uncorr_cells_fine'%name_dataset
+elif mesh_id == 2:
+    dir_results = f'../../../../Data/Verification/regression/ds3/INLA_%s_uncorr_cells_medium'%name_dataset
+elif mesh_id == 3:
+    dir_results = f'../../../../Data/Verification/regression/ds3/INLA_%s_uncorr_cells_coarse'%name_dataset
+    
 #cell info
 fname_cellinfo = dir_syndata + '/' + 'CatalogNGAWest3CALite_cellinfo.csv'
 fname_distmat  = dir_syndata + '/' + 'CatalogNGAWest3CALite_distancematrix.csv'
 
-#directories (regression results)
-if pkg_id == 1:
-    dir_results = f'../../../../Data/Verification/regression/ds2/PYSTAN_%s'%name_dataset
-elif pkg_id == 2:
-    dir_results = f'../../../../Data/Verification/regression/ds2/PYSTAN3_%s'%name_dataset
-elif pkg_id == 3:
-    dir_results = f'../../../../Data/Verification/regression/ds2/CMDSTAN_%s'%name_dataset
-# #directories (regression results)
-# if pkg_id == 1:
-#     dir_results = f'../../../../Data/Verification/regression_old/ds2/PYSTAN_%s'%name_dataset
-# elif pkg_id == 2:
-#     dir_results = f'../../../../Data/Verification/regression_old/ds2/PYSTAN3_%s'%name_dataset
-# elif pkg_id == 3:
-#     dir_results = f'../../../../Data/Verification/regression_old/ds2/CMDSTAN_%s'%name_dataset
-    
 #prefix for synthetic data and results
 prfx_syndata  = 'CatalogNGAWest3CALite_synthetic'
 
 #regression results filename prefix
 prfx_results  = f'%s_syndata'%name_dataset
-
-# FILE INFO FOR REGRESSION RESULTS
-# ++++++++++++++++++++++++++++++++++++++++
-
-#output filename sufix (synthetic dataset)
-if corr_id == 1:   synds_suffix = '_small_corr_len' 
-elif corr_id == 2: synds_suffix = '_large_corr_len'
-#output filename sufix (regression results)
-if aprox_id == 1:   synds_suffix_stan = '_corr_cells' + synds_suffix
-elif aprox_id == 2: synds_suffix_stan = '_corr_cells' + '_chol' + synds_suffix
-elif aprox_id == 3: synds_suffix_stan = '_corr_cells' + '_chol_eff' + synds_suffix
-elif aprox_id == 4: synds_suffix_stan = '_corr_cells' + '_chol_eff2' + synds_suffix
-elif aprox_id == 5: synds_suffix_stan = '_corr_cells' + '_chol_eff_sp' + synds_suffix
-
-# FILE INFO FOR REGRESSION RESULTS
-# ++++++++++++++++++++++++++++++++++++++++
-
-#output filename sufix (synthetic dataset)
-if corr_id == 1:   synds_suffix = '_small_corr_len' 
-elif corr_id == 2: synds_suffix = '_large_corr_len'
-#output filename sufix (regression results)
-if aprox_id == 1:   synds_suffix_stan = '_uncorr_cells' + synds_suffix
-elif aprox_id == 2: synds_suffix_stan = '_uncorr_cells' + '_chol' + synds_suffix
-elif aprox_id == 3: synds_suffix_stan = '_uncorr_cells' + '_chol_eff' + synds_suffix
-elif aprox_id == 4: synds_suffix_stan = '_uncorr_cells' + '_chol_eff2' + synds_suffix
-elif aprox_id == 5: synds_suffix_stan = '_uncorr_cells' + '_chol_eff_sp' + synds_suffix
 
 # dataset info 
 ds_id = np.arange(1,6)
@@ -124,18 +87,45 @@ if corr_id == 1:
     # small correlation lengths
     hyp = {'omega_0': 0.1, 'omega_1e':0.1, 'omega_1as': 0.35, 'omega_1bs': 0.25,
            'ell_1e':60, 'ell_1as':30, 
+           'c_2_erg': -2.0, 
+           'omega_2': 0.2,
+           'omega_2p': 0.15, 'ell_2p': 80,
+           'c_3_erg':-0.6, 
+           'omega_3': 0.15,
+           'omega_3s': 0.15, 'ell_3s': 130,
            'c_cap_erg': -0.011,
            'omega_cap_mu': 0.005, 'omega_ca1p':0.004, 'omega_ca2p':0.002,
            'ell_ca1p': 75,
-           'phi_0':0.4, 'tau_0':0.3 }
+           'phi_0':0.3, 'tau_0':0.25 }
 elif corr_id == 2:
-    #large correlation lengths
+    # large correlation lengths
     hyp = {'omega_0': 0.1, 'omega_1e':0.2, 'omega_1as': 0.4, 'omega_1bs': 0.3,
            'ell_1e':100, 'ell_1as':70, 
+           'c_2_erg': -2.0, 
+           'omega_2': 0.2,
+           'omega_2p': 0.15, 'ell_2e': 140,
+           'c_3_erg':-0.6, 
+           'omega_3': 0.15,
+           'omega_3s': 0.15, 'ell_3s': 180,
            'c_cap_erg': -0.02,
            'omega_cap_mu': 0.008, 'omega_ca1p':0.005, 'omega_ca2p':0.003,
            'ell_ca1p': 120,
-           'phi_0':0.4, 'tau_0':0.3}
+           'phi_0':0.3, 'tau_0':0.25}
+# ++++++++++++++++++++++++++++++++++++++++
+
+# FILE INFO FOR REGRESSION RESULTS
+# ++++++++++++++++++++++++++++++++++++++++
+#output filename sufix
+if corr_id == 1:
+    synds_suffix = '_small_corr_len' 
+elif corr_id == 2:
+    synds_suffix = '_large_corr_len'
+    
+#kenel info
+if ker_id == 1:
+    ker_suffix = '' 
+elif ker_id == 2:
+    ker_suffix = '_nexp'
 # ++++++++++++++++++++++++++++++++++++++++
 
 #ploting options
@@ -157,19 +147,19 @@ for d_id in ds_id:
     #file names
     #synthetic data
     fname_sdata_gmotion = '%s/%s_%s%s_Y%i'%(dir_syndata, prfx_syndata, 'data',  synds_suffix, d_id)  + '.csv'
-    fname_sdata_atten   = '%s/%s_%s%s_Y%i'%(dir_syndata, prfx_syndata, 'atten', synds_suffix, d_id) + '.csv'
+    fname_sdata_atten   = '%s/%s_%s%s_Y%i'%(dir_syndata, prfx_syndata, 'atten', synds_suffix, d_id)  + '.csv'
     #regression results
-    fname_reg_gmotion = '%s%s/Y%i/%s%s_Y%i_stan_%s'%(dir_results, synds_suffix_stan, d_id, prfx_results, synds_suffix, d_id, 'residuals')    + '.csv'
-    fname_reg_coeff   = '%s%s/Y%i/%s%s_Y%i_stan_%s'%(dir_results, synds_suffix_stan, d_id, prfx_results, synds_suffix, d_id, 'coefficients') + '.csv'
-    fname_reg_atten   = '%s%s/Y%i/%s%s_Y%i_stan_%s'%(dir_results, synds_suffix_stan, d_id, prfx_results, synds_suffix, d_id, 'catten')       + '.csv'
-    
+    fname_reg_gmotion = '%s%s/Y%i/%s%s_Y%i_inla_%s'%(dir_results, ker_suffix+synds_suffix, d_id, prfx_results, synds_suffix, d_id, 'residuals')    + '.csv'
+    fname_reg_coeff   = '%s%s/Y%i/%s%s_Y%i_inla_%s'%(dir_results, ker_suffix+synds_suffix, d_id, prfx_results, synds_suffix, d_id, 'coefficients') + '.csv'
+    fname_reg_atten   = '%s%s/Y%i/%s%s_Y%i_inla_%s'%(dir_results, ker_suffix+synds_suffix, d_id, prfx_results, synds_suffix, d_id, 'catten') + '.csv'
+   
     #load synthetic results
     df_sdata_gmotion = pd.read_csv(fname_sdata_gmotion).set_index('rsn')
     df_sdata_atten   = pd.read_csv(fname_sdata_atten).set_index('cellid')
     #load regression results
-    df_reg_gmotion = pd.read_csv(fname_reg_gmotion, index_col=0)
-    df_reg_coeff   = pd.read_csv(fname_reg_coeff, index_col=0)
-    df_reg_atten   = pd.read_csv(fname_reg_atten, index_col=0)
+    df_reg_gmotion = pd.read_csv(fname_reg_gmotion).set_index('rsn')
+    df_reg_coeff   = pd.read_csv(fname_reg_coeff).set_index('rsn')
+    df_reg_atten   = pd.read_csv(fname_reg_atten).set_index('cellid')
     
     # Processing
     #---   ---   ---   ---   ---
@@ -185,13 +175,15 @@ for d_id in ds_id:
     
     #number of paths per cell
     cell_npath = np.sum(df_dmat.loc[:,df_reg_atten.cellname] > 0, axis=0)
-
+    
     # Compute Root Mean Square Error
     #---   ---   ---   ---   ---    
     df_misfit.loc['Y%i'%d_id,'nerg_tot_rms'] = CalcRMS(df_sdata_gmotion.nerg_gm.values,            df_reg_gmotion.nerg_mu.values)
     df_misfit.loc['Y%i'%d_id,'dc_1e_rms']    = CalcRMS(df_sdata_gmotion['dc_1e'].values[eq_idx],   df_reg_coeff['dc_1e_mean'].values[eq_idx])
     df_misfit.loc['Y%i'%d_id,'dc_1as_rms']   = CalcRMS(df_sdata_gmotion['dc_1as'].values[sta_idx], df_reg_coeff['dc_1as_mean'].values[sta_idx])
     df_misfit.loc['Y%i'%d_id,'dc_1bs_rms']   = CalcRMS(df_sdata_gmotion['dc_1bs'].values[sta_idx], df_reg_coeff['dc_1bs_mean'].values[sta_idx])
+    df_misfit.loc['Y%i'%d_id,'c_2p_rms']     = CalcRMS(df_sdata_gmotion['c_2p'].values[eq_idx],    df_reg_coeff['c_2p_mean'].values[eq_idx])
+    df_misfit.loc['Y%i'%d_id,'c_3s_rms']     = CalcRMS(df_sdata_gmotion['c_3s'].values[sta_idx],   df_reg_coeff['c_3s_mean'].values[sta_idx])
     df_misfit.loc['Y%i'%d_id,'c_cap_rms']    = CalcRMS(df_sdata_atten['c_cap'].values,             df_reg_atten['c_cap_mean'].values)
     
     # Compute Divergence
@@ -200,12 +192,14 @@ for d_id in ds_id:
     df_misfit.loc['Y%i'%d_id,'dc_1e_KL']    = CalcLKDivergece(df_sdata_gmotion['dc_1e'].values[eq_idx],   df_reg_coeff['dc_1e_mean'].values[eq_idx])
     df_misfit.loc['Y%i'%d_id,'dc_1as_KL']   = CalcLKDivergece(df_sdata_gmotion['dc_1as'].values[sta_idx], df_reg_coeff['dc_1as_mean'].values[sta_idx])
     df_misfit.loc['Y%i'%d_id,'dc_1bs_KL']   = CalcLKDivergece(df_sdata_gmotion['dc_1bs'].values[sta_idx], df_reg_coeff['dc_1bs_mean'].values[sta_idx])
+    df_misfit.loc['Y%i'%d_id,'c_2p_KL']     = CalcLKDivergece(df_sdata_gmotion['c_2p'].values[eq_idx],    df_reg_coeff['c_2p_mean'].values[eq_idx])
+    df_misfit.loc['Y%i'%d_id,'c_3s_KL']     = CalcLKDivergece(df_sdata_gmotion['c_3s'].values[sta_idx],   df_reg_coeff['c_3s_mean'].values[sta_idx])
     df_misfit.loc['Y%i'%d_id,'c_cap_KL']    = CalcLKDivergece(df_sdata_atten['c_cap'].values,             df_reg_atten['c_cap_mean'].values)
     
     # Output
     #---   ---   ---   ---   ---
     #figure directory
-    dir_fig = '%s%s/Y%i/figures_cmp/'%(dir_results,synds_suffix_stan,d_id)
+    dir_fig = '%s%s/Y%i/figures_cmp/'%(dir_results, ker_suffix+synds_suffix, d_id)
     pathlib.Path(dir_fig).mkdir(parents=True, exist_ok=True)
         
     #compare ground motion predictions
@@ -255,8 +249,8 @@ for d_id in ds_id:
     # plt_lim = (plt_lim[:,0].min(), plt_lim[:,1].max())
     # ax.set_xlim(plt_lim)
     # ax.set_ylim(plt_lim)
-    ax.set_xlim([-.4,.4])
-    ax.set_ylim([-.4,.4])  
+    ax.set_xlim([-2,2])
+    ax.set_ylim([-2,2])
     #save figure
     fig.tight_layout()
     fig.savefig( dir_fig + fname_fig + '.png' )
@@ -278,8 +272,8 @@ for d_id in ds_id:
     ax.tick_params(axis='y', labelsize=22)
     #plot limits
     # ax.set_ylim(np.abs(ax.get_ylim()).max()*np.array([-1,1]))
-    ax.set_xlim([0,.15])
-    ax.set_ylim([-.4,.4])   
+    ax.set_xlim([0,.5])
+    ax.set_ylim([-2,2])
     #save figure
     fig.tight_layout()
     fig.savefig( dir_fig + fname_fig + '.png' )
@@ -303,7 +297,7 @@ for d_id in ds_id:
     #plot limits
     # ax.set_ylim(np.abs(ax.get_ylim()).max()*np.array([-1,1]))
     ax.set_xlim([0.9,1e3])
-    ax.set_ylim([-.4,.4])   
+    ax.set_ylim([-2,2])
     #save figure
     fig.tight_layout()
     fig.savefig( dir_fig + fname_fig + '.png' )
@@ -329,8 +323,8 @@ for d_id in ds_id:
     # plt_lim = (plt_lim[:,0].min(), plt_lim[:,1].max())
     # ax.set_xlim(plt_lim)
     # ax.set_ylim(plt_lim)
-    ax.set_xlim([-1.5,1.5])
-    ax.set_ylim([-1.5,1.5])
+    ax.set_xlim([-2,2])
+    ax.set_ylim([-2,2])
     #save figure
     fig.tight_layout()
     fig.savefig( dir_fig + fname_fig + '.png' )
@@ -352,8 +346,8 @@ for d_id in ds_id:
     ax.tick_params(axis='y', labelsize=22)
     #plot limits
     # ax.set_ylim(np.abs(ax.get_ylim()).max()*np.array([-1,1]))
-    ax.set_xlim([0,.4])
-    ax.set_ylim([-1.5,1.5])
+    ax.set_xlim([0,.5])
+    ax.set_ylim([-2,2])
     #save figure
     fig.tight_layout()
     fig.savefig( dir_fig + fname_fig + '.png' )
@@ -377,7 +371,7 @@ for d_id in ds_id:
     #plot limits
     # ax.set_ylim(np.abs(ax.get_ylim()).max()*np.array([-1,1]))
     ax.set_xlim([.9,1000])
-    ax.set_ylim([-1.5,1.5])
+    ax.set_ylim([-2,2])
     #save figure
     fig.tight_layout()
     fig.savefig( dir_fig + fname_fig + '.png' )
@@ -403,8 +397,8 @@ for d_id in ds_id:
     # plt_lim = (plt_lim[:,0].min(), plt_lim[:,1].max())
     # ax.set_xlim(plt_lim)
     # ax.set_ylim(plt_lim)
-    ax.set_xlim([-1.5,1.5])
-    ax.set_ylim([-1.5,1.5])
+    ax.set_xlim([-2,2])
+    ax.set_ylim([-2,2])
     #save figure
     fig.tight_layout()
     fig.savefig( dir_fig + fname_fig + '.png' )
@@ -427,7 +421,7 @@ for d_id in ds_id:
     #plot limits
     # ax.set_ylim(np.abs(ax.get_ylim()).max()*np.array([-1,1]))
     ax.set_xlim([0,.4])
-    ax.set_ylim([-1.5,1.5])
+    ax.set_ylim([-2,2])
     #save figure
     fig.tight_layout()
     fig.savefig( dir_fig + fname_fig + '.png' )
@@ -451,7 +445,155 @@ for d_id in ds_id:
     #plot limits
     # ax.set_ylim(np.abs(ax.get_ylim()).max()*np.array([-1,1]))
     ax.set_xlim([.9,1000])
-    ax.set_ylim([-1.5,1.5])
+    ax.set_ylim([-2,2])
+    #save figure
+    fig.tight_layout()
+    fig.savefig( dir_fig + fname_fig + '.png' )
+    
+    #compare c_2p
+    #...   ...   ...   ...   ...   ...
+    #figure title
+    fname_fig = 'Y%i_c_2p_scatter'%d_id
+    #create figure
+    fig, ax = plt.subplots(figsize = (10,10))
+    #coefficient scatter
+    ax.scatter(df_sdata_gmotion['c_2p'].values[eq_idx], df_reg_coeff['c_2p_mean'].values[eq_idx])
+    ax.axline((0,0), slope=1, color="black", linestyle="--")
+    #edit figure
+    if not flag_report: ax.set_title(r'Comparison $c_{2,P}$, Y: %i'%d_id, fontsize=30)
+    ax.set_xlabel('Synthetic dataset', fontsize=25)
+    ax.set_ylabel('Estimated',         fontsize=25)
+    ax.grid(which='both')
+    ax.tick_params(axis='x', labelsize=22)
+    ax.tick_params(axis='y', labelsize=22)
+    #plot limits
+    # plt_lim = np.array([ax.get_xlim(), ax.get_ylim()])
+    # plt_lim = (plt_lim[:,0].min(), plt_lim[:,1].max())
+    # ax.set_xlim(plt_lim)
+    # ax.set_ylim(plt_lim)
+    ax.set_xlim([-2.3,-1.6])
+    ax.set_ylim([-2.3,-1.6])  
+    #save figure
+    fig.tight_layout()
+    fig.savefig( dir_fig + fname_fig + '.png' )
+    
+    #figure title
+    fname_fig = 'Y%i_c_2p_accuracy'%d_id
+    #create figure
+    fig, ax = plt.subplots(figsize = (10,10))
+    #coefficient scatter
+    ax.scatter(df_reg_coeff['c_2p_sig'].values[eq_idx],
+               df_sdata_gmotion['c_2p'].values[eq_idx] - df_reg_coeff['c_2p_mean'].values[eq_idx])
+    ax.axline((0,0), slope=0, color="black", linestyle="--")
+    #edit figure
+    if not flag_report: ax.set_title(r'Comparison $c_{2,P}$, Y: %i'%d_id, fontsize=30)
+    ax.set_xlabel('Standard Deviation', fontsize=25)
+    ax.set_ylabel('Actual - Estimated', fontsize=25)
+    ax.grid(which='both')
+    ax.tick_params(axis='x', labelsize=22)
+    ax.tick_params(axis='y', labelsize=22)
+    #plot limits
+    # ax.set_ylim(np.abs(ax.get_ylim()).max()*np.array([-1,1]))
+    ax.set_xlim([0,.15])
+    ax.set_ylim([-.4,.4])   
+    #save figure
+    fig.tight_layout()
+    fig.savefig( dir_fig + fname_fig + '.png' )
+    
+    #figure title
+    fname_fig = 'Y%i_c_2p_nrec'%d_id
+    #create figure
+    fig, ax = plt.subplots(figsize = (10,10))
+    #coefficient scatter
+    ax.scatter(eq_nrec,
+               df_sdata_gmotion['c_2p'].values[eq_idx] - df_reg_coeff['c_2p_mean'].values[eq_idx])
+    ax.axline((0,0), slope=0, color="black", linestyle="--")
+    #edit figure
+    if not flag_report: ax.set_title(r'Comparison $c_{2,P}$, Y: %i'%d_id, fontsize=30)
+    ax.set_xlabel('Number of records',  fontsize=25)
+    ax.set_ylabel('Actual - Estimated', fontsize=25)
+    ax.grid(which='both')
+    ax.set_xscale('log')
+    ax.tick_params(axis='x', labelsize=22)
+    ax.tick_params(axis='y', labelsize=22)
+    #plot limits
+    # ax.set_ylim(np.abs(ax.get_ylim()).max()*np.array([-1,1]))
+    ax.set_xlim([0.9,1e3])
+    ax.set_ylim([-.4,.4])   
+    #save figure
+    fig.tight_layout()
+    fig.savefig( dir_fig + fname_fig + '.png' )
+    
+    #compare c_3s
+    #...   ...   ...   ...   ...   ...
+    #figure title
+    fname_fig = 'Y%i_c_3s_scatter'%d_id
+    #create figure
+    fig, ax = plt.subplots(figsize = (10,10))
+    #coefficient scatter
+    ax.scatter(df_sdata_gmotion['c_3s'].values[sta_idx], df_reg_coeff['c_3s_mean'].values[sta_idx])
+    ax.axline((0,0), slope=1, color="black", linestyle="--")
+    #edit figure
+    if not flag_report: ax.set_title(r'Comparison $c_{3,S}$, Y: %i'%d_id, fontsize=30)
+    ax.set_xlabel('Synthetic dataset', fontsize=25)
+    ax.set_ylabel('Estimated',         fontsize=25)
+    ax.grid(which='both')
+    ax.tick_params(axis='x', labelsize=22)
+    ax.tick_params(axis='y', labelsize=22)
+    #plot limits
+    # plt_lim = np.array([ax.get_xlim(), ax.get_ylim()])
+    # plt_lim = (plt_lim[:,0].min(), plt_lim[:,1].max())
+    # ax.set_xlim(plt_lim)
+    # ax.set_ylim(plt_lim)
+    ax.set_xlim([-1.2,-.2])
+    ax.set_ylim([-1.2,-.2])  
+    #save figure
+    fig.tight_layout()
+    fig.savefig( dir_fig + fname_fig + '.png' )
+    
+    #figure title
+    fname_fig = 'Y%i_c_3s_accuracy'%d_id
+    #create figure
+    fig, ax = plt.subplots(figsize = (10,10))
+    #coefficient scatter
+    ax.scatter(df_reg_coeff['c_3s_sig'].values[sta_idx],
+               df_sdata_gmotion['c_3s'].values[sta_idx] - df_reg_coeff['c_3s_mean'].values[sta_idx])
+    ax.axline((0,0), slope=0, color="black", linestyle="--")
+    #edit figure
+    if not flag_report: ax.set_title(r'Comparison $c_{3,S}$, Y: %i'%d_id, fontsize=30)
+    ax.set_xlabel('Standard Deviation', fontsize=25)
+    ax.set_ylabel('Actual - Estimated', fontsize=25)
+    ax.grid(which='both')
+    ax.tick_params(axis='x', labelsize=22)
+    ax.tick_params(axis='y', labelsize=22)
+    #plot limits
+    # ax.set_ylim(np.abs(ax.get_ylim()).max()*np.array([-1,1]))
+    ax.set_xlim([0,.3])
+    ax.set_ylim([-.4,.4])   
+    #save figure
+    fig.tight_layout()
+    fig.savefig( dir_fig + fname_fig + '.png' )
+    
+    #figure title
+    fname_fig = 'Y%i_c_3s_nrec'%d_id
+    #create figure
+    fig, ax = plt.subplots(figsize = (10,10))
+    #coefficient scatter
+    ax.scatter(sta_nrec,
+               df_sdata_gmotion['c_3s'].values[sta_idx] - df_reg_coeff['c_3s_mean'].values[sta_idx])
+    ax.axline((0,0), slope=0, color="black", linestyle="--")
+    #edit figure
+    if not flag_report: ax.set_title(r'Comparison $c_{3,S}$, Y: %i'%d_id, fontsize=30)
+    ax.set_xlabel('Number of records',  fontsize=25)
+    ax.set_ylabel('Actual - Estimated', fontsize=25)
+    ax.grid(which='both')
+    ax.set_xscale('log')
+    ax.tick_params(axis='x', labelsize=22)
+    ax.tick_params(axis='y', labelsize=22)
+    #plot limits
+    # ax.set_ylim(np.abs(ax.get_ylim()).max()*np.array([-1,1]))
+    ax.set_xlim([0.9,1e3])
+    ax.set_ylim([-.4,.4])   
     #save figure
     fig.tight_layout()
     fig.savefig( dir_fig + fname_fig + '.png' )
@@ -534,7 +676,7 @@ for d_id in ds_id:
 # Compare Misfit Metrics
 # ---------------------------
 #summary directory
-dir_sum = '%s%s/summary/'%(dir_results,synds_suffix_stan)
+dir_sum = '%s%s/summary/'%(dir_results,ker_suffix+synds_suffix)
 pathlib.Path(dir_fig).mkdir(parents=True, exist_ok=True)
 #figure directory
 dir_fig = '%s/figures/'%(dir_sum)
@@ -551,6 +693,8 @@ ax.plot(ds_id, df_misfit.nerg_tot_rms, linestyle='-', marker='o', linewidth=2, m
 ax.plot(ds_id, df_misfit.dc_1e_rms,    linestyle='-', marker='o', linewidth=2, markersize=10, label=r'$\delta c_{1,E}$')
 ax.plot(ds_id, df_misfit.dc_1as_rms,   linestyle='-', marker='o', linewidth=2, markersize=10, label=r'$\delta c_{1a,S}$')
 ax.plot(ds_id, df_misfit.dc_1bs_rms,   linestyle='-', marker='o', linewidth=2, markersize=10, label=r'$\delta c_{1b,S}$')
+ax.plot(ds_id, df_misfit.c_2p_rms,     linestyle='-', marker='o', linewidth=2, markersize=10, label=r'$c_{2,E}$')
+ax.plot(ds_id, df_misfit.c_3s_rms,     linestyle='-', marker='o', linewidth=2, markersize=10, label=r'$c_{3,S}$')
 ax.plot(ds_id, df_misfit.c_cap_rms,    linestyle='-', marker='o', linewidth=2, markersize=10, label=r'$c_{ca,P}$')
 #figure properties
 ax.set_ylim([0,0.50])
@@ -575,6 +719,8 @@ ax.plot(ds_id, df_misfit.nerg_tot_KL, linestyle='-', marker='o', linewidth=2, ma
 ax.plot(ds_id, df_misfit.dc_1e_KL,    linestyle='-', marker='o', linewidth=2, markersize=10, label=r'$\delta c_{1,E}$')
 ax.plot(ds_id, df_misfit.dc_1as_KL,   linestyle='-', marker='o', linewidth=2, markersize=10, label=r'$\delta c_{1a,S}$')
 ax.plot(ds_id, df_misfit.dc_1bs_KL,   linestyle='-', marker='o', linewidth=2, markersize=10, label=r'$\delta c_{1b,S}$')
+ax.plot(ds_id, df_misfit.c_2p_KL,     linestyle='-', marker='o', linewidth=2, markersize=10, label=r'$c_{2,P}$')
+ax.plot(ds_id, df_misfit.c_3s_KL,     linestyle='-', marker='o', linewidth=2, markersize=10, label=r'$c_{3,S}$')
 ax.plot(ds_id, df_misfit.c_cap_KL,    linestyle='-', marker='o', linewidth=2, markersize=10, label=r'$c_{ca,P}$')
 #figure properties
 ax.set_ylim([0,0.50])
@@ -601,8 +747,8 @@ for d_id in ds_id:
     # Load Data
     #---   ---   ---   ---   ---
     #regression hyperparamters results
-    fname_reg_hyp      = '%s%s/Y%i/%s%s_Y%i_stan_%s'%(dir_results,synds_suffix_stan, d_id,prfx_results, synds_suffix, d_id, 'hyperparameters') + '.csv'
-    fname_reg_hyp_post = '%s%s/Y%i/%s%s_Y%i_stan_%s'%(dir_results,synds_suffix_stan, d_id,prfx_results, synds_suffix, d_id, 'hyperposterior')  + '.csv'  
+    fname_reg_hyp      = '%s%s/Y%i/%s%s_Y%i_inla_%s'%(dir_results, ker_suffix+synds_suffix, d_id,prfx_results, synds_suffix, d_id, 'hyperparameters') + '.csv'
+    fname_reg_hyp_post = '%s%s/Y%i/%s%s_Y%i_inla_%s'%(dir_results, ker_suffix+synds_suffix, d_id,prfx_results, synds_suffix, d_id, 'hyperposterior')  + '.csv'  
     #load regression results
     df_reg_hyp.append( pd.read_csv(fname_reg_hyp, index_col=0) )
     df_reg_hyp_post.append( pd.read_csv(fname_reg_hyp_post, index_col=0) )
@@ -617,17 +763,19 @@ fname_fig = 'post_dist_' + name_hyp
 fig, ax = plt.subplots(figsize = (10,10))   
 for d_id, df_r_h, df_r_h_p in zip(ds_id, df_reg_hyp, df_reg_hyp_post):
     #estimate vertical line height for mean and mode
-    ymax_mode = 40
+    ymax_mode = df_r_h_p.loc[:,name_hyp+'_pdf'].max()
+    # ymax_mean = 1.5*np.ceil(ymax_mode/10)*10
     ymax_mean = 40
     #plot posterior dist
-    pl_hyp = ax.vlines(df_r_h.loc['mean',name_hyp], ymin=0, ymax=ymax_mean, linestyle='-',  label='Mean')
-    ax.vlines(df_r_h.loc['prc_0.50',name_hyp], ymin=0, ymax=ymax_mode, linestyle='--', color=pl_hyp.get_color(), label='Mode')
+    pl_pdf = ax.plot(df_r_h_p.loc[:,name_hyp], df_r_h_p.loc[:,name_hyp+'_pdf'])
+    ax.vlines(df_r_h.loc[name_hyp,'mean'], ymin=0, ymax=ymax_mean, linestyle='-',  color=pl_pdf[0].get_color(), label='Mean')
+    ax.vlines(df_r_h.loc[name_hyp,'mode'], ymin=0, ymax=ymax_mode, linestyle='--', color=pl_pdf[0].get_color(), label='Mode')
 #plot true value
 ymax_hyp = ymax_mean
 ax.vlines(hyp[name_hyp], ymin=0, ymax=ymax_hyp, linestyle='-', linewidth=4, color='black', label='True value')
 #edit figure
 if not flag_report: ax.set_title(r'Comparison $\omega_{1,E}$',     fontsize=30)
-ax.set_xlabel('$\omega_{1,E}$',                fontsize=25)
+ax.set_xlabel('$\omega_{1,e}$',                fontsize=25)
 ax.set_ylabel('probability density function ', fontsize=25)
 ax.grid(which='both')
 ax.tick_params(axis='x', labelsize=22)
@@ -649,17 +797,19 @@ fname_fig = 'post_dist_' + name_hyp
 fig, ax = plt.subplots(figsize = (10,10))   
 for d_id, df_r_h, df_r_h_p in zip(ds_id, df_reg_hyp, df_reg_hyp_post):
     #estimate vertical line height for mean and mode
-    ymax_mode = 30
+    ymax_mode = df_r_h_p.loc[:,name_hyp+'_pdf'].max()
+    # ymax_mean = 1.5*np.ceil(ymax_mode/10)*10
     ymax_mean = 30
     #plot posterior dist
-    pl_hyp = ax.vlines(df_r_h.loc['mean',name_hyp], ymin=0, ymax=ymax_mean, linestyle='-',  label='Mean')
-    ax.vlines(df_r_h.loc['prc_0.50',name_hyp], ymin=0, ymax=ymax_mode, linestyle='--', color=pl_hyp.get_color(), label='Mode')
+    pl_pdf = ax.plot(df_r_h_p.loc[:,name_hyp], df_r_h_p.loc[:,name_hyp+'_pdf'])
+    ax.vlines(df_r_h.loc[name_hyp,'mean'], ymin=0, ymax=ymax_mean, linestyle='-',  color=pl_pdf[0].get_color(), label='Mean')
+    ax.vlines(df_r_h.loc[name_hyp,'mode'], ymin=0, ymax=ymax_mode, linestyle='--', color=pl_pdf[0].get_color(), label='Mode')
 #plot true value
 ymax_hyp = ymax_mean
 ax.vlines(hyp[name_hyp], ymin=0, ymax=ymax_hyp, linestyle='-', linewidth=4, color='black', label='True value')
 #edit figure
 if not flag_report: ax.set_title(r'Comparison $\omega_{1a,S}$',     fontsize=30)
-ax.set_xlabel('$\omega_{1a,S}$',                fontsize=25)
+ax.set_xlabel('$\omega_{1a,s}$',                fontsize=25)
 ax.set_ylabel('probability density function ', fontsize=25)
 ax.grid(which='both')
 ax.tick_params(axis='x', labelsize=22)
@@ -681,6 +831,40 @@ fname_fig = 'post_dist_' + name_hyp
 fig, ax = plt.subplots(figsize = (10,10))   
 for d_id, df_r_h, df_r_h_p in zip(ds_id, df_reg_hyp, df_reg_hyp_post):
     #estimate vertical line height for mean and mode
+    ymax_mode = df_r_h_p.loc[:,name_hyp+'_pdf'].max()
+    # ymax_mean = 1.5*np.ceil(ymax_mode/10)*10
+    ymax_mean = 60
+    #plot posterior dist
+    pl_pdf = ax.plot(df_r_h_p.loc[:,name_hyp], df_r_h_p.loc[:,name_hyp+'_pdf'])
+    ax.vlines(df_r_h.loc[name_hyp,'mean'], ymin=0, ymax=ymax_mean, linestyle='-',  color=pl_pdf[0].get_color(), label='Mean')
+    ax.vlines(df_r_h.loc[name_hyp,'mode'], ymin=0, ymax=ymax_mode, linestyle='--', color=pl_pdf[0].get_color(), label='Mode')
+#plot true value
+ymax_hyp = ymax_mean
+ax.vlines(hyp[name_hyp], ymin=0, ymax=ymax_hyp, linestyle='-', linewidth=4, color='black', label='True value')
+#edit figure
+if not flag_report: ax.set_title(r'Comparison $\omega_{1b,S}$',     fontsize=30)
+ax.set_xlabel('$\omega_{1b,s}$',                fontsize=25)
+ax.set_ylabel('probability density function ', fontsize=25)
+ax.grid(which='both')
+ax.tick_params(axis='x', labelsize=22)
+ax.tick_params(axis='y', labelsize=22)
+#plot limits
+ax.set_xlim([0,0.5])
+ax.set_ylim([0,ymax_hyp])
+#save figure
+fig.tight_layout()
+fig.savefig( dir_fig + fname_fig + '.png' )
+
+# Omega_2p
+#---   ---   ---   ---   ---
+#hyper-paramter name
+name_hyp = 'omega_2p'
+#figure title
+fname_fig = 'post_dist_' + name_hyp
+#create figure
+fig, ax = plt.subplots(figsize = (10,10))   
+for d_id, df_r_h, df_r_h_p in zip(ds_id, df_reg_hyp, df_reg_hyp_post):
+    #estimate vertical line height for mean and mode
     ymax_mode = 60
     ymax_mean = 60
     #plot posterior dist
@@ -690,8 +874,40 @@ for d_id, df_r_h, df_r_h_p in zip(ds_id, df_reg_hyp, df_reg_hyp_post):
 ymax_hyp = ymax_mean
 ax.vlines(hyp[name_hyp], ymin=0, ymax=ymax_hyp, linestyle='-', linewidth=4, color='black', label='True value')
 #edit figure
-if not flag_report: ax.set_title(r'Comparison $\omega_{1b,S}$',     fontsize=30)
-ax.set_xlabel('$\omega_{1b,S}$',                fontsize=25)
+if not flag_report: ax.set_title(r'Comparison $\omega_{2,P}$',     fontsize=30)
+ax.set_xlabel('$\omega_{2,p}$',                fontsize=25)
+ax.set_ylabel('probability density function ', fontsize=25)
+ax.grid(which='both')
+ax.tick_params(axis='x', labelsize=22)
+ax.tick_params(axis='y', labelsize=22)
+#plot limits
+ax.set_xlim([0,0.5])
+ax.set_ylim([0,ymax_hyp])
+#save figure
+fig.tight_layout()
+fig.savefig( dir_fig + fname_fig + '.png' )
+
+# Omega_3s
+#---   ---   ---   ---   ---
+#hyper-paramter name
+name_hyp = 'omega_3s'
+#figure title
+fname_fig = 'post_dist_' + name_hyp
+#create figure
+fig, ax = plt.subplots(figsize = (10,10))   
+for d_id, df_r_h, df_r_h_p in zip(ds_id, df_reg_hyp, df_reg_hyp_post):
+    #estimate vertical line height for mean and mode
+    ymax_mode = 60
+    ymax_mean = 60
+    #plot posterior dist
+    pl_hyp = ax.vlines(df_r_h.loc['mean',name_hyp], ymin=0, ymax=ymax_mean, linestyle='-',  label='Mean')
+    ax.vlines(df_r_h.loc['prc_0.50',name_hyp], ymin=0, ymax=ymax_mode, linestyle='--', color=pl_hyp.get_color(), label='Mode')
+#plot true value
+ymax_hyp = ymax_mean
+ax.vlines(hyp[name_hyp], ymin=0, ymax=ymax_hyp, linestyle='-', linewidth=4, color='black', label='True value')
+#edit figure
+if not flag_report: ax.set_title(r'Comparison $\omega_{3,S}$',     fontsize=30)
+ax.set_xlabel('$\omega_{3,s}$',                fontsize=25)
 ax.set_ylabel('probability density function ', fontsize=25)
 ax.grid(which='both')
 ax.tick_params(axis='x', labelsize=22)
@@ -710,20 +926,22 @@ name_hyp = 'ell_1e'
 #figure title
 fname_fig = 'post_dist_' + name_hyp
 #create figure
-fig, ax = plt.subplots(figsize = (10,10))  
+fig, ax = plt.subplots(figsize = (10,10))   
 for d_id, df_r_h, df_r_h_p in zip(ds_id, df_reg_hyp, df_reg_hyp_post):
     #estimate vertical line height for mean and mode
-    ymax_mode = 0.02
+    ymax_mode = df_r_h_p.loc[:,name_hyp+'_pdf'].max()
+    # ymax_mean = 1.5*np.ceil(ymax_mode/10)*10
     ymax_mean = 0.02
     #plot posterior dist
-    pl_hyp = ax.vlines(df_r_h.loc['mean',name_hyp], ymin=0, ymax=ymax_mean, linestyle='-',  label='Mean')
-    ax.vlines(df_r_h.loc['prc_0.50',name_hyp], ymin=0, ymax=ymax_mode, linestyle='--', color=pl_hyp.get_color(), label='Mode')
+    pl_pdf = ax.plot(df_r_h_p.loc[:,name_hyp], df_r_h_p.loc[:,name_hyp+'_pdf'])
+    ax.vlines(df_r_h.loc[name_hyp,'mean'], ymin=0, ymax=ymax_mean, linestyle='-',  color=pl_pdf[0].get_color(), label='Mean')
+    ax.vlines(df_r_h.loc[name_hyp,'mode'], ymin=0, ymax=ymax_mode, linestyle='--', color=pl_pdf[0].get_color(), label='Mode')
 #plot true value
 ymax_hyp = ymax_mean
 ax.vlines(hyp[name_hyp], ymin=0, ymax=ymax_hyp, linestyle='-', linewidth=4, color='black', label='True value')
 #edit figure
 if not flag_report: ax.set_title(r'Comparison $\ell_{1,E}$',     fontsize=30)
-ax.set_xlabel('$\ell_{1,E}$',                fontsize=25)
+ax.set_xlabel('$\ell_{1,e}$',                fontsize=25)
 ax.set_ylabel('probability density function ', fontsize=25)
 ax.grid(which='both')
 ax.tick_params(axis='x', labelsize=22)
@@ -745,17 +963,19 @@ fname_fig = 'post_dist_' + name_hyp
 fig, ax = plt.subplots(figsize = (10,10))   
 for d_id, df_r_h, df_r_h_p in zip(ds_id, df_reg_hyp, df_reg_hyp_post):
     #estimate vertical line height for mean and mode
-    ymax_mode = 0.1
+    ymax_mode = df_r_h_p.loc[:,name_hyp+'_pdf'].max()
+    # ymax_mean = 1.5*np.ceil(ymax_mode/10)*10
     ymax_mean = 0.1
     #plot posterior dist
-    pl_hyp = ax.vlines(df_r_h.loc['mean',name_hyp], ymin=0, ymax=ymax_mean, linestyle='-',  label='Mean')
-    ax.vlines(df_r_h.loc['prc_0.50',name_hyp], ymin=0, ymax=ymax_mode, linestyle='--', color=pl_hyp.get_color(), label='Mode')
+    pl_pdf = ax.plot(df_r_h_p.loc[:,name_hyp], df_r_h_p.loc[:,name_hyp+'_pdf'])
+    ax.vlines(df_r_h.loc[name_hyp,'mean'], ymin=0, ymax=ymax_mean, linestyle='-',  color=pl_pdf[0].get_color(), label='Mean')
+    ax.vlines(df_r_h.loc[name_hyp,'mode'], ymin=0, ymax=ymax_mode, linestyle='--', color=pl_pdf[0].get_color(), label='Mode')
 #plot true value
 ymax_hyp = ymax_mean
 ax.vlines(hyp[name_hyp], ymin=0, ymax=ymax_hyp, linestyle='-', linewidth=4, color='black', label='True value')
 #edit figure
 if not flag_report: ax.set_title(r'Comparison $\ell_{1a,S}$',     fontsize=30)
-ax.set_xlabel('$\ell_{1a,S}$',                fontsize=25)
+ax.set_xlabel('$\ell_{1a,s}$',                fontsize=25)
 ax.set_ylabel('probability density function ', fontsize=25)
 ax.grid(which='both')
 ax.tick_params(axis='x', labelsize=22)
@@ -767,6 +987,71 @@ ax.set_ylim([0,ymax_hyp])
 fig.tight_layout()
 fig.savefig( dir_fig + fname_fig + '.png' )
 
+# Ell_2p
+#---   ---   ---   ---   ---
+#hyper-paramter name
+name_hyp = 'ell_2p'
+#figure title
+fname_fig = 'post_dist_' + name_hyp
+#create figure
+fig, ax = plt.subplots(figsize = (10,10))   
+for d_id, df_r_h, df_r_h_p in zip(ds_id, df_reg_hyp, df_reg_hyp_post):
+    #estimate vertical line height for mean and mode
+    ymax_mode = 0.1
+    ymax_mean = 0.1
+    #plot posterior dist
+    pl_hyp = ax.vlines(df_r_h.loc['mean',name_hyp], ymin=0, ymax=ymax_mean, linestyle='-',  label='Mean')
+    ax.vlines(df_r_h.loc['prc_0.50',name_hyp], ymin=0, ymax=ymax_mode, linestyle='--', color=pl_hyp.get_color(), label='Mode')
+#plot true value
+ymax_hyp = ymax_mean
+ax.vlines(hyp[name_hyp], ymin=0, ymax=ymax_hyp, linestyle='-', linewidth=4, color='black', label='True value')
+#edit figure
+if not flag_report: ax.set_title(r'Comparison $\ell_{2,P}$',     fontsize=30)
+ax.set_xlabel('$\ell_{2,p}$',                fontsize=25)
+ax.set_ylabel('probability density function ', fontsize=25)
+ax.grid(which='both')
+ax.tick_params(axis='x', labelsize=22)
+ax.tick_params(axis='y', labelsize=22)
+#plot limits
+ax.set_xlim([0,150])
+ax.set_ylim([0,ymax_hyp])
+#save figure
+fig.tight_layout()
+fig.savefig( dir_fig + fname_fig + '.png' )
+
+# Ell_3s
+#---   ---   ---   ---   ---
+#hyper-paramter name
+name_hyp = 'ell_3s'
+#figure title
+fname_fig = 'post_dist_' + name_hyp
+#create figure
+fig, ax = plt.subplots(figsize = (10,10))   
+for d_id, df_r_h, df_r_h_p in zip(ds_id, df_reg_hyp, df_reg_hyp_post):
+    #estimate vertical line height for mean and mode
+    ymax_mode = 0.1
+    ymax_mean = 0.1
+    #plot posterior dist
+    pl_hyp = ax.vlines(df_r_h.loc['mean',name_hyp], ymin=0, ymax=ymax_mean, linestyle='-',  label='Mean')
+    ax.vlines(df_r_h.loc['prc_0.50',name_hyp], ymin=0, ymax=ymax_mode, linestyle='--', color=pl_hyp.get_color(), label='Mode')
+#plot true value
+ymax_hyp = ymax_mean
+ax.vlines(hyp[name_hyp], ymin=0, ymax=ymax_hyp, linestyle='-', linewidth=4, color='black', label='True value')
+#edit figure
+if not flag_report: ax.set_title(r'Comparison $\ell_{3,S}$',     fontsize=30)
+ax.set_xlabel('$\ell_{3,s}$',                  fontsize=25)
+ax.set_ylabel('probability density function ', fontsize=25)
+ax.grid(which='both')
+ax.tick_params(axis='x', labelsize=22)
+ax.tick_params(axis='y', labelsize=22)
+#plot limits
+ax.set_xlim([0,150])
+ax.set_ylim([0,ymax_hyp])
+#save figure
+fig.tight_layout()
+fig.savefig( dir_fig + fname_fig + '.png' )
+
+
 # Tau_0
 #---   ---   ---   ---   ---
 #hyper-paramter name
@@ -777,11 +1062,13 @@ fname_fig = 'post_dist_' + name_hyp
 fig, ax = plt.subplots(figsize = (10,10))   
 for d_id, df_r_h, df_r_h_p in zip(ds_id, df_reg_hyp, df_reg_hyp_post):
     #estimate vertical line height for mean and mode
-    ymax_mode = 150
-    ymax_mean = 150
+    ymax_mode = df_r_h_p.loc[:,name_hyp+'_pdf'].max()
+    # ymax_mean = 1.5*np.ceil(ymax_mode/10)*10
+    ymax_mean = 60
     #plot posterior dist
-    pl_hyp = ax.vlines(df_r_h.loc['mean',name_hyp], ymin=0, ymax=ymax_mean, linestyle='-',  label='Mean')
-    ax.vlines(df_r_h.loc['prc_0.50',name_hyp], ymin=0, ymax=ymax_mode, linestyle='--', color=pl_hyp.get_color(), label='Mode')
+    pl_pdf = ax.plot(df_r_h_p.loc[:,name_hyp], df_r_h_p.loc[:,name_hyp+'_pdf'])
+    ax.vlines(df_r_h.loc[name_hyp,'mean'], ymin=0, ymax=ymax_mean, linestyle='-',  color=pl_pdf[0].get_color(), label='Mean')
+    ax.vlines(df_r_h.loc[name_hyp,'mode'], ymin=0, ymax=ymax_mode, linestyle='--', color=pl_pdf[0].get_color(), label='Mode')
 #plot true value
 ymax_hyp = ymax_mean
 ax.vlines(hyp[name_hyp], ymin=0, ymax=ymax_hyp, linestyle='-', linewidth=4, color='black', label='True value')
@@ -810,11 +1097,13 @@ fname_fig = 'post_dist_' + name_hyp
 fig, ax = plt.subplots(figsize = (10,10))   
 for d_id, df_r_h, df_r_h_p in zip(ds_id, df_reg_hyp, df_reg_hyp_post):
     #estimate vertical line height for mean and mode
-    ymax_mode = 1000
-    ymax_mean = 1000
+    ymax_mode = df_r_h_p.loc[:,name_hyp+'_pdf'].max()
+    # ymax_mean = 1.5*np.ceil(ymax_mode/10)*10
+    ymax_mean = 100
     #plot posterior dist
-    pl_hyp = ax.vlines(df_r_h.loc['mean',name_hyp], ymin=0, ymax=ymax_mean, linestyle='-',  label='Mean')
-    ax.vlines(df_r_h.loc['prc_0.50',name_hyp], ymin=0, ymax=ymax_mode, linestyle='--', color=pl_hyp.get_color(), label='Mode')
+    pl_pdf = ax.plot(df_r_h_p.loc[:,name_hyp], df_r_h_p.loc[:,name_hyp+'_pdf'])
+    ax.vlines(df_r_h.loc[name_hyp,'mean'], ymin=0, ymax=ymax_mean, linestyle='-',  color=pl_pdf[0].get_color(), label='Mean')
+    ax.vlines(df_r_h.loc[name_hyp,'mode'], ymin=0, ymax=ymax_mode, linestyle='--', color=pl_pdf[0].get_color(), label='Mode')
 #plot true value
 ymax_hyp = ymax_mean
 ax.vlines(hyp[name_hyp], ymin=0, ymax=ymax_hyp, linestyle='-', linewidth=4, color='black', label='True value')
@@ -842,17 +1131,19 @@ fname_fig = 'post_dist_' + name_hyp
 fig, ax = plt.subplots(figsize = (10,10))   
 for d_id, df_r_h, df_r_h_p in zip(ds_id, df_reg_hyp, df_reg_hyp_post):
     #estimate vertical line height for mean and mode
-    ymax_mode = 1500
+    ymax_mode = df_r_h_p.loc[:,name_hyp+'_pdf'].max()
+    # ymax_mean = 1.5*np.ceil(ymax_mode/10)*10
     ymax_mean = 1500
     #plot posterior dist
-    pl_hyp = ax.vlines(df_r_h.loc['mean',name_hyp], ymin=0, ymax=ymax_mean, linestyle='-',  label='Mean')
-    ax.vlines(df_r_h.loc['prc_0.50',name_hyp], ymin=0, ymax=ymax_mode, linestyle='--', color=pl_hyp.get_color(), label='Mode')
+    pl_pdf = ax.plot(df_r_h_p.loc[:,name_hyp], df_r_h_p.loc[:,name_hyp+'_pdf'])
+    ax.vlines(df_r_h.loc[name_hyp,'mean'], ymin=0, ymax=ymax_mean, linestyle='-',  color=pl_pdf[0].get_color(), label='Mean')
+    ax.vlines(df_r_h.loc[name_hyp,'mode'], ymin=0, ymax=ymax_mode, linestyle='--', color=pl_pdf[0].get_color(), label='Mode')
 #plot true value
 ymax_hyp = ymax_mean
 ax.vlines(np.sqrt(hyp['omega_ca1p']**2+hyp['omega_ca2p']**2), ymin=0, ymax=ymax_hyp, linestyle='-', linewidth=4, color='black', label='True value')
 #edit figure
 if not flag_report: ax.set_title(r'Comparison $\omega_{ca,P}$',     fontsize=30)
-ax.set_xlabel('$\omega_{ca,P}$',                fontsize=25)
+ax.set_xlabel('$\omega_{ca,p}$',                fontsize=25)
 ax.set_ylabel('probability density function ', fontsize=25)
 ax.grid(which='both')
 ax.tick_params(axis='x', labelsize=22)

@@ -73,6 +73,13 @@ elif pkg_id == 2:
     dir_results = f'../../../../Data/Verification/regression/ds2/PYSTAN3_%s'%name_dataset
 elif pkg_id == 3:
     dir_results = f'../../../../Data/Verification/regression/ds2/CMDSTAN_%s'%name_dataset
+#directories (regression results)
+if pkg_id == 1:
+    dir_results = f'../../../../Data/Verification/regression_old/ds2/PYSTAN_%s'%name_dataset
+elif pkg_id == 2:
+    dir_results = f'../../../../Data/Verification/regression_old/ds2/PYSTAN3_%s'%name_dataset
+elif pkg_id == 3:
+    dir_results = f'../../../../Data/Verification/regression_old/ds2/CMDSTAN_%s'%name_dataset
     
 #prefix for synthetic data and results
 prfx_syndata  = 'CatalogNGAWest3CALite_synthetic'
@@ -224,7 +231,7 @@ for d_id in ds_id:
     ax.scatter(df_sdata_gmotion['dc_1e'].values[eq_idx], df_reg_coeff['dc_1e_mean'].values[eq_idx])
     ax.axline((0,0), slope=1, color="black", linestyle="--")
     #edit figure
-    if not flag_report: ax.set_title(r'Comparison $\delta c_{1,e}$, Y: %i'%d_id, fontsize=30)
+    if not flag_report: ax.set_title(r'Comparison $\delta c_{1,E}$, Y: %i'%d_id, fontsize=30)
     ax.set_xlabel('Synthetic dataset', fontsize=25)
     ax.set_ylabel('Estimated',         fontsize=25)
     ax.grid(which='both')
@@ -250,7 +257,7 @@ for d_id in ds_id:
                df_sdata_gmotion['dc_1e'].values[eq_idx] - df_reg_coeff['dc_1e_mean'].values[eq_idx])
     ax.axline((0,0), slope=0, color="black", linestyle="--")
     #edit figure
-    if not flag_report: ax.set_title(r'Comparison $\delta c_{1,e}$, Y: %i'%d_id, fontsize=30)
+    if not flag_report: ax.set_title(r'Comparison $\delta c_{1,E}$, Y: %i'%d_id, fontsize=30)
     ax.set_xlabel('Standard Deviation', fontsize=25)
     ax.set_ylabel('Actual - Estimated', fontsize=25)
     ax.grid(which='both')
@@ -273,7 +280,7 @@ for d_id in ds_id:
                df_sdata_gmotion['dc_1e'].values[eq_idx] - df_reg_coeff['dc_1e_mean'].values[eq_idx])
     ax.axline((0,0), slope=0, color="black", linestyle="--")
     #edit figure
-    if not flag_report: ax.set_title(r'Comparison $\delta c_{1,e}$, Y: %i'%d_id, fontsize=30)
+    if not flag_report: ax.set_title(r'Comparison $\delta c_{1,E}$, Y: %i'%d_id, fontsize=30)
     ax.set_xlabel('Number of records',  fontsize=25)
     ax.set_ylabel('Actual - Estimated', fontsize=25)
     ax.grid(which='both')
@@ -298,7 +305,7 @@ for d_id in ds_id:
     ax.scatter(df_sdata_gmotion['dc_1as'].values[sta_idx], df_reg_coeff['dc_1as_mean'].values[sta_idx])
     ax.axline((0,0), slope=1, color="black", linestyle="--")
     #edit figure
-    if not flag_report: ax.set_title(r'Comparison $\delta c_{1a,s}$, Y: %i'%d_id, fontsize=30)
+    if not flag_report: ax.set_title(r'Comparison $\delta c_{1a,S}$, Y: %i'%d_id, fontsize=30)
     ax.set_xlabel('Synthetic dataset', fontsize=25)
     ax.set_ylabel('Estimated',         fontsize=25)
     ax.grid(which='both')
@@ -324,7 +331,7 @@ for d_id in ds_id:
                df_sdata_gmotion['dc_1as'].values[sta_idx] - df_reg_coeff['dc_1as_mean'].values[sta_idx])
     ax.axline((0,0), slope=0, color="black", linestyle="--")
     #edit figure
-    if not flag_report: ax.set_title(r'Comparison $\delta c_{1a,s}$, Y: %i'%d_id, fontsize=30)
+    if not flag_report: ax.set_title(r'Comparison $\delta c_{1a,S}$, Y: %i'%d_id, fontsize=30)
     ax.set_xlabel('Standard Deviation', fontsize=25)
     ax.set_ylabel('Actual - Estimated', fontsize=25)
     ax.grid(which='both')
@@ -347,7 +354,7 @@ for d_id in ds_id:
                df_sdata_gmotion['dc_1as'].values[sta_idx] - df_reg_coeff['dc_1as_mean'].values[sta_idx])
     ax.axline((0,0), slope=0, color="black", linestyle="--")
     #edit figure
-    if not flag_report: ax.set_title(r'Comparison $\delta c_{1a,s}$, Y: %i'%d_id, fontsize=30)
+    if not flag_report: ax.set_title(r'Comparison $\delta c_{1a,S}$, Y: %i'%d_id, fontsize=30)
     ax.set_xlabel('Number of records',  fontsize=25)
     ax.set_ylabel('Actual - Estimated', fontsize=25)
     ax.grid(which='both')
@@ -372,7 +379,7 @@ for d_id in ds_id:
     ax.scatter(df_sdata_gmotion['dc_1bs'].values[sta_idx], df_reg_coeff['dc_1bs_mean'].values[sta_idx])
     ax.axline((0,0), slope=1, color="black", linestyle="--")
     #edit figure
-    if not flag_report: ax.set_title(r'Comparison $\delta c_{1b,s}$, Y: %i'%d_id, fontsize=30)
+    if not flag_report: ax.set_title(r'Comparison $\delta c_{1b,S}$, Y: %i'%d_id, fontsize=30)
     ax.set_xlabel('Synthetic dataset', fontsize=25)
     ax.set_ylabel('Estimated',         fontsize=25)
     ax.grid(which='both')
@@ -398,7 +405,7 @@ for d_id in ds_id:
                df_sdata_gmotion['dc_1bs'].values[sta_idx] - df_reg_coeff['dc_1bs_mean'].values[sta_idx])
     ax.axline((0,0), slope=0, color="black", linestyle="--")
     #edit figure
-    if not flag_report: ax.set_title(r'Comparison $\delta c_{1b,s}$, Y: %i'%d_id, fontsize=30)
+    if not flag_report: ax.set_title(r'Comparison $\delta c_{1b,S}$, Y: %i'%d_id, fontsize=30)
     ax.set_xlabel('Standard Deviation', fontsize=25)
     ax.set_ylabel('Actual - Estimated', fontsize=25)
     ax.grid(which='both')
@@ -421,7 +428,7 @@ for d_id in ds_id:
                df_sdata_gmotion['dc_1bs'].values[sta_idx] - df_reg_coeff['dc_1bs_mean'].values[sta_idx])
     ax.axline((0,0), slope=0, color="black", linestyle="--")
     #edit figure
-    if not flag_report: ax.set_title(r'Comparison $\delta c_{1b,s}$, Y: %i'%d_id, fontsize=30)
+    if not flag_report: ax.set_title(r'Comparison $\delta c_{1b,S}$, Y: %i'%d_id, fontsize=30)
     ax.set_xlabel('Number of records',  fontsize=25)
     ax.set_ylabel('Actual - Estimated', fontsize=25)
     ax.grid(which='both')
@@ -446,7 +453,7 @@ for d_id in ds_id:
     ax.scatter(df_sdata_atten['c_cap'].values, df_reg_atten['c_cap_mean'].values)
     ax.axline((0,0), slope=1, color="black", linestyle="--")
     #edit figure
-    if not flag_report: ax.set_title(r'Comparison $c_{ca,p}$, Y: %i'%d_id, fontsize=30)
+    if not flag_report: ax.set_title(r'Comparison $c_{ca,P}$, Y: %i'%d_id, fontsize=30)
     ax.set_xlabel('Synthetic dataset', fontsize=25)
     ax.set_ylabel('Estimated',         fontsize=25)
     ax.grid(which='both')
@@ -472,7 +479,7 @@ for d_id in ds_id:
                df_sdata_atten['c_cap'].values - df_reg_atten['c_cap_mean'].values)
     ax.axline((0,0), slope=0, color="black", linestyle="--")
     #edit figure
-    if not flag_report: ax.set_title(r'Comparison $c_{ca,p}$, Y: %i'%d_id, fontsize=30)
+    if not flag_report: ax.set_title(r'Comparison $c_{ca,P}$, Y: %i'%d_id, fontsize=30)
     ax.set_xlabel('Standard Deviation', fontsize=25)
     ax.set_ylabel('Actual - Estimated', fontsize=25)
     ax.grid(which='both')
@@ -495,7 +502,7 @@ for d_id in ds_id:
                df_sdata_atten['c_cap'].values - df_reg_atten['c_cap_mean'].values)
     ax.axline((0,0), slope=0, color="black", linestyle="--")
     #edit figure
-    if not flag_report: ax.set_title(r'Comparison $c_{ca,p}$, Y: %i'%d_id, fontsize=30)
+    if not flag_report: ax.set_title(r'Comparison $c_{ca,P}$, Y: %i'%d_id, fontsize=30)
     ax.set_xlabel('Number of paths',    fontsize=25)
     ax.set_ylabel('Actual - Estimated', fontsize=25)
     ax.grid(which='both')
@@ -528,10 +535,10 @@ fname_fig = 'misfit_score'
 #plot KL divergence
 fig, ax = plt.subplots(figsize = (10,10))   
 ax.plot(ds_id, df_misfit.nerg_tot_rms, linestyle='-', marker='o', linewidth=2, markersize=10, label= 'tot nerg')
-ax.plot(ds_id, df_misfit.dc_1e_rms,    linestyle='-', marker='o', linewidth=2, markersize=10, label=r'$\delta c_{1,e}$')
-ax.plot(ds_id, df_misfit.dc_1as_rms,   linestyle='-', marker='o', linewidth=2, markersize=10, label=r'$\delta c_{1a,s}$')
-ax.plot(ds_id, df_misfit.dc_1bs_rms,   linestyle='-', marker='o', linewidth=2, markersize=10, label=r'$\delta c_{1b,s}$')
-ax.plot(ds_id, df_misfit.c_cap_rms,    linestyle='-', marker='o', linewidth=2, markersize=10, label=r'$\c_{ca,p}$')
+ax.plot(ds_id, df_misfit.dc_1e_rms,    linestyle='-', marker='o', linewidth=2, markersize=10, label=r'$\delta c_{1,E}$')
+ax.plot(ds_id, df_misfit.dc_1as_rms,   linestyle='-', marker='o', linewidth=2, markersize=10, label=r'$\delta c_{1a,S}$')
+ax.plot(ds_id, df_misfit.dc_1bs_rms,   linestyle='-', marker='o', linewidth=2, markersize=10, label=r'$\delta c_{1b,S}$')
+ax.plot(ds_id, df_misfit.c_cap_rms,    linestyle='-', marker='o', linewidth=2, markersize=10, label=r'$c_{ca,P}$')
 #figure properties
 ax.set_ylim([0,0.50])
 ax.set_xlabel('synthetic dataset', fontsize=25)
@@ -552,10 +559,10 @@ fname_fig = 'KLdiv_score'
 #plot KL divergence
 fig, ax = plt.subplots(figsize = (10,10))   
 ax.plot(ds_id, df_misfit.nerg_tot_KL, linestyle='-', marker='o', linewidth=2, markersize=10, label= 'tot nerg')
-ax.plot(ds_id, df_misfit.dc_1e_KL,    linestyle='-', marker='o', linewidth=2, markersize=10, label=r'$\delta c_{1,e}$')
-ax.plot(ds_id, df_misfit.dc_1as_KL,   linestyle='-', marker='o', linewidth=2, markersize=10, label=r'$\delta c_{1a,s}$')
-ax.plot(ds_id, df_misfit.dc_1bs_KL,   linestyle='-', marker='o', linewidth=2, markersize=10, label=r'$\delta c_{1b,s}$')
-ax.plot(ds_id, df_misfit.c_cap_KL,    linestyle='-', marker='o', linewidth=2, markersize=10, label=r'$\c_{ca,p}$')
+ax.plot(ds_id, df_misfit.dc_1e_KL,    linestyle='-', marker='o', linewidth=2, markersize=10, label=r'$\delta c_{1,E}$')
+ax.plot(ds_id, df_misfit.dc_1as_KL,   linestyle='-', marker='o', linewidth=2, markersize=10, label=r'$\delta c_{1a,S}$')
+ax.plot(ds_id, df_misfit.dc_1bs_KL,   linestyle='-', marker='o', linewidth=2, markersize=10, label=r'$\delta c_{1b,S}$')
+ax.plot(ds_id, df_misfit.c_cap_KL,    linestyle='-', marker='o', linewidth=2, markersize=10, label=r'$c_{ca,P}$')
 #figure properties
 ax.set_ylim([0,0.50])
 ax.set_xlabel('synthetic dataset', fontsize=25)
@@ -607,8 +614,8 @@ for d_id, df_r_h, df_r_h_p in zip(ds_id, df_reg_hyp, df_reg_hyp_post):
 ymax_hyp = ymax_mean
 ax.vlines(hyp[name_hyp], ymin=0, ymax=ymax_hyp, linestyle='-', linewidth=4, color='black', label='True value')
 #edit figure
-if not flag_report: ax.set_title(r'Comparison $\omega_{1,e}$',     fontsize=30)
-ax.set_xlabel('$\omega_{1,e}$',                fontsize=25)
+if not flag_report: ax.set_title(r'Comparison $\omega_{1,E}$',     fontsize=30)
+ax.set_xlabel('$\omega_{1,E}$',                fontsize=25)
 ax.set_ylabel('probability density function ', fontsize=25)
 ax.grid(which='both')
 ax.tick_params(axis='x', labelsize=22)
@@ -639,8 +646,8 @@ for d_id, df_r_h, df_r_h_p in zip(ds_id, df_reg_hyp, df_reg_hyp_post):
 ymax_hyp = ymax_mean
 ax.vlines(hyp[name_hyp], ymin=0, ymax=ymax_hyp, linestyle='-', linewidth=4, color='black', label='True value')
 #edit figure
-if not flag_report: ax.set_title(r'Comparison $\omega_{1a,s}$',     fontsize=30)
-ax.set_xlabel('$\omega_{1a,s}$',                fontsize=25)
+if not flag_report: ax.set_title(r'Comparison $\omega_{1a,S}$',     fontsize=30)
+ax.set_xlabel('$\omega_{1a,S}$',                fontsize=25)
 ax.set_ylabel('probability density function ', fontsize=25)
 ax.grid(which='both')
 ax.tick_params(axis='x', labelsize=22)
@@ -671,8 +678,8 @@ for d_id, df_r_h, df_r_h_p in zip(ds_id, df_reg_hyp, df_reg_hyp_post):
 ymax_hyp = ymax_mean
 ax.vlines(hyp[name_hyp], ymin=0, ymax=ymax_hyp, linestyle='-', linewidth=4, color='black', label='True value')
 #edit figure
-if not flag_report: ax.set_title(r'Comparison $\omega_{1b,s}$',     fontsize=30)
-ax.set_xlabel('$\omega_{1b,s}$',                fontsize=25)
+if not flag_report: ax.set_title(r'Comparison $\omega_{1b,S}$',     fontsize=30)
+ax.set_xlabel('$\omega_{1b,S}$',                fontsize=25)
 ax.set_ylabel('probability density function ', fontsize=25)
 ax.grid(which='both')
 ax.tick_params(axis='x', labelsize=22)
@@ -703,8 +710,8 @@ for d_id, df_r_h, df_r_h_p in zip(ds_id, df_reg_hyp, df_reg_hyp_post):
 ymax_hyp = ymax_mean
 ax.vlines(hyp[name_hyp], ymin=0, ymax=ymax_hyp, linestyle='-', linewidth=4, color='black', label='True value')
 #edit figure
-if not flag_report: ax.set_title(r'Comparison $\ell_{1,e}$',     fontsize=30)
-ax.set_xlabel('$\ell_{1,e}$',                fontsize=25)
+if not flag_report: ax.set_title(r'Comparison $\ell_{1,E}$',     fontsize=30)
+ax.set_xlabel('$\ell_{1,E}$',                fontsize=25)
 ax.set_ylabel('probability density function ', fontsize=25)
 ax.grid(which='both')
 ax.tick_params(axis='x', labelsize=22)
@@ -735,8 +742,8 @@ for d_id, df_r_h, df_r_h_p in zip(ds_id, df_reg_hyp, df_reg_hyp_post):
 ymax_hyp = ymax_mean
 ax.vlines(hyp[name_hyp], ymin=0, ymax=ymax_hyp, linestyle='-', linewidth=4, color='black', label='True value')
 #edit figure
-if not flag_report: ax.set_title(r'Comparison $\ell_{1a,s}$',     fontsize=30)
-ax.set_xlabel('$\ell_{1a,s}$',                fontsize=25)
+if not flag_report: ax.set_title(r'Comparison $\ell_{1a,S}$',     fontsize=30)
+ax.set_xlabel('$\ell_{1a,S}$',                fontsize=25)
 ax.set_ylabel('probability density function ', fontsize=25)
 ax.grid(which='both')
 ax.tick_params(axis='x', labelsize=22)
@@ -832,8 +839,8 @@ for d_id, df_r_h, df_r_h_p in zip(ds_id, df_reg_hyp, df_reg_hyp_post):
 ymax_hyp = ymax_mean
 ax.vlines(hyp['omega_ca2p'], ymin=0, ymax=ymax_hyp, linestyle='-', linewidth=4, color='black', label='True value')
 #edit figure
-if not flag_report: ax.set_title(r'Comparison $\omega_{ca1,p}$',     fontsize=30)
-ax.set_xlabel('$\omega_{ca1,p}$',                fontsize=25)
+if not flag_report: ax.set_title(r'Comparison $\omega_{ca1,P}$',     fontsize=30)
+ax.set_xlabel('$\omega_{ca1,P}$',                fontsize=25)
 ax.set_ylabel('probability density function ', fontsize=25)
 ax.grid(which='both')
 ax.tick_params(axis='x', labelsize=22)
@@ -864,8 +871,8 @@ for d_id, df_r_h, df_r_h_p in zip(ds_id, df_reg_hyp, df_reg_hyp_post):
 ymax_hyp = ymax_mean
 ax.vlines(hyp['omega_ca2p'], ymin=0, ymax=ymax_hyp, linestyle='-', linewidth=4, color='black', label='True value')
 #edit figure
-if not flag_report: ax.set_title(r'Comparison $\omega_{ca2,p}$',     fontsize=30)
-ax.set_xlabel('$\omega_{ca2,p}$',                fontsize=25)
+if not flag_report: ax.set_title(r'Comparison $\omega_{ca2,P}$',     fontsize=30)
+ax.set_xlabel('$\omega_{ca2,P}$',                fontsize=25)
 ax.set_ylabel('probability density function ', fontsize=25)
 ax.grid(which='both')
 ax.tick_params(axis='x', labelsize=22)
@@ -896,8 +903,8 @@ for d_id, df_r_h, df_r_h_p in zip(ds_id, df_reg_hyp, df_reg_hyp_post):
 ymax_hyp = ymax_mean
 ax.vlines(hyp[name_hyp], ymin=0, ymax=ymax_hyp, linestyle='-', linewidth=4, color='black', label='True value')
 #edit figure
-if not flag_report: ax.set_title(r'Comparison $\ell_{ca1,p}$',     fontsize=30)
-ax.set_xlabel('$\ell_{ca1,p}$',                fontsize=25)
+if not flag_report: ax.set_title(r'Comparison $\ell_{ca1,P}$',     fontsize=30)
+ax.set_xlabel('$\ell_{ca1,P}$',                fontsize=25)
 ax.set_ylabel('probability density function ', fontsize=25)
 ax.grid(which='both')
 ax.tick_params(axis='x', labelsize=22)

@@ -57,8 +57,8 @@ out_dir_main   = '../../../../Data/Verification/regression/ds1/'
 
 #stan parameters
 runstan_flag = True
-# pystan_ver = 2
-# pystan_ver = 3
+#pystan_ver = 2
+pystan_ver = 3
 res_name = 'tot'
 n_iter   = 1000
 n_chains = 4

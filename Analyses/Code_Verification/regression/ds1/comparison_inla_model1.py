@@ -7,7 +7,7 @@ Created on Thu Aug 12 20:52:09 2021
 """
 # Working directory and Packages
 # ---------------------------
-#load packages
+#load variables
 import os
 import sys
 import pathlib
@@ -35,23 +35,23 @@ from pylib_stats import CalcLKDivergece
 #processed dataset
 # name_dataset = 'NGAWest2CANorth'
 # name_dataset  = 'NGAWest2CA'
-name_dataset  = 'NGAWest3CA'
+# name_dataset  = 'NGAWest3CA'
 
 #correlation info
 # 1: Small Correlation Lengths
 # 2: Large Correlation Lenghts
-corr_id = 1
+# corr_id = 1
 
 #kernel function 
 # 1: Mattern kernel (alpha=2)
 # 2: Negative Exp   (alpha=3/2)
-ker_id = 1
+# ker_id = 1
 
 #mesh type
 # 1: Fine Mesh
 # 2: Medium Mesh
 # 3: Coarse Mesh
-mesh_id = 3
+# mesh_id = 3
 
 #directories (synthetic dataset)
 if corr_id == 1:
@@ -123,7 +123,7 @@ for d_id in ds_id:
     #regression results
     fname_reg_gmotion = '%s%s/Y%i/%s%s_Y%i_inla_%s'%(dir_results, ker_suffix+synds_suffix, d_id, prfx_results, synds_suffix, d_id, 'residuals')    + '.csv'
     fname_reg_coeff   = '%s%s/Y%i/%s%s_Y%i_inla_%s'%(dir_results, ker_suffix+synds_suffix, d_id, prfx_results, synds_suffix, d_id, 'coefficients') + '.csv'
-    
+
     #load synthetic results
     df_sdata_gmotion = pd.read_csv(fname_sdata_gmotion).set_index('rsn')
     #load regression results
