@@ -1,7 +1,7 @@
 # Non-ergodic Methodology and Modeling Tools
 
 This repository contains software tools for developing Nonergodic Ground Motion Models (NGMMs) based on the varying coefficient (Landwehr et al., 2016) and cell-specific anelastic attention approach (Dawood and Rodriguez‐Marek, 2013). 
-Developed tools are available for R using the statistical package (R-INLA, https://www.r-inla.org/) and in python using the CMDSTAN and PYSTAN interface packages for the Bayesian software (Stan, https://mc-stan.org/).
+Developed tools are available for R using the statistical package (R-INLA, https://www.r-inla.org/) and in python using the CMDSTAN and PYSTAN interface packages for the Bayesian software (Stan, https://mc-stan.org/). Documentation and detailed instructions on the use of the developed tools is provided in [Lavrentiadis et al., 2022a GIRS report](https://www.risksciences.ucla.edu/girs-reports/2022/04). A general introduction and considerations for the development of NGMMs are presented in Lavrentiadis et al., 2022b.
 
 ## Home Page
 The project's home page with links to the various project deliverables is: https://www.risksciences.ucla.edu/nhr3/ngmm
@@ -43,4 +43,6 @@ Dawood, H. M., & Rodriguez‐Marek, A. (2013). A method for including path effec
 
 Landwehr, N., Kuehn, N. M., Scheffer, T., & Abrahamson, N. (2016). A nonergodic ground‐motion model for California with spatially varying coefficients. Bulletin of the Seismological Society of America, 106(6), 2574-2583.
 
-Lavrentiadis, G., Abrahamson, N. A., Nicolas, K. M., Bozorgnia, Y., Goulet, C. A., Babič, A., ... & Walling, M. (2022). Overview and Introduction to Development of Non-Ergodic Earthquake Ground-Motion Models. Bulletin of Earthquake Engineering
+Lavrentiadis, G., Nicolas, K. M., Bozorgnia, Y., Seylabi, E., Meng, X., Goulet, C., & Kottke, A. (2022a) Non‐ergodic Methodology and Modeling Tools. Natural Hazards Risk and Resiliency Research Center: The Garrick Institute for the Risk Sciences, University of California, Los Angeles
+
+Lavrentiadis, G., Abrahamson, N. A., Nicolas, K. M., Bozorgnia, Y., Goulet, C. A., Babič, A., ... & Walling, M. (2022b). Overview and Introduction to Development of Non-Ergodic Earthquake Ground-Motion Models. Bulletin of Earthquake Engineering
