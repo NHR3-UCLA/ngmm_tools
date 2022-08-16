@@ -1,4 +1,5 @@
-# Required python packages
+# Required python packages 
+# for MyBinder
 #--------------------------
 numpy
 scipy

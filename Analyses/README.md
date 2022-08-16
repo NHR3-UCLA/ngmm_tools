@@ -6,5 +6,5 @@
  * ``Python_lib``: folder containing the Python scripts
  * ``R_lib``: folder containing the R scripts
  * ``Stan_lib``: folder containing the STAN regression files for the NGMM regression
- * [Launch Prior Distribution Visualization Tool](https://mybinder.org/v2/gh/NHR3-UCLA/ngmm_tools/b800d714318803830a2f75d72ea373a3e2e8cd51?urlpath=lab%2Ftree%2FAnalyses%2Fprior_distributions.ipynb)
+ * [Launch the Prior Distribution Visualization Tool](https://mybinder.org/v2/gh/NHR3-UCLA/ngmm_tools/b800d714318803830a2f75d72ea373a3e2e8cd51?urlpath=lab%2Ftree%2FAnalyses%2Fprior_distributions.ipynb)
  
