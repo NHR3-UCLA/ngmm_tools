@@ -2,6 +2,7 @@
 
  * ``Data_Preparation``: folder containing the Jupyter notebooks to prepare the inpu files for the NGMM regression
  * ``Regression``: folder containing the Jupyter notebooks for the NGMM regression using INLA, CMDSTAN, and PYSTAN
+ * ``Prediction`` folder containing Jupyter notebooks and examples to make predictions using NGMMs
  * ``Code_Verification``: folder containing the codes used in the verification exercise
  * ``Python_lib``: folder containing the Python scripts
  * ``R_lib``: folder containing the R scripts
