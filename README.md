@@ -5,6 +5,7 @@ Developed tools are available for R using the statistical package (R-INLA, https
 
 ## Home Page
 The project's home page with links to the various project deliverables is: https://www.risksciences.ucla.edu/nhr3/ngmm
+The project's data are accesible through [DesignSafe](https://www.designsafe-ci.org/data/browser/public/designsafe.storage.published/PRJ-5771)
 
 ## Folder Structure
 The main folder ``Analyses`` contains all the regression, prediction, hazard implementation, testing, and library scripts. 
