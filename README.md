@@ -1,11 +1,11 @@
 # Non-ergodic Methodology and Modeling Tools
 
 This repository contains software tools for developing Nonergodic Ground Motion Models (NGMMs) based on the varying coefficient (Landwehr et al., 2016) and cell-specific anelastic attention approach (Dawood and Rodriguez‐Marek, 2013). 
-Developed tools are available for R using the statistical package (R-INLA, https://www.r-inla.org/) and in python using the CMDSTAN and PYSTAN interface packages for the Bayesian software (Stan, https://mc-stan.org/). Documentation and detailed instructions on the use of the developed tools is provided in [Lavrentiadis et al., 2022a GIRS report](https://www.risksciences.ucla.edu/girs-reports/2022/04). A general introduction and considerations for the development of NGMMs are presented in Lavrentiadis et al., 2022b.
+Developed tools are available for R using the statistical package (R-INLA, https://www.r-inla.org/) and in python using the CMDSTAN and PYSTAN interface packages for the Bayesian software (Stan, https://mc-stan.org/). Documentation and detailed instructions on the use of the developed tools are provided in [Lavrentiadis et al., 2022a GIRS report](https://www.risksciences.ucla.edu/girs-reports/2022/04). A general introduction and considerations for the development of NGMMs are presented in Lavrentiadis et al., 2022b.
 
 ## Home Page
 The project's home page with links to the various project deliverables is: https://www.risksciences.ucla.edu/nhr3/ngmm
-The project's data are accesible through [DesignSafe](https://www.designsafe-ci.org/data/browser/public/designsafe.storage.published/PRJ-5771)
+The project's data are accessible through [DesignSafe](https://www.designsafe-ci.org/data/browser/public/designsafe.storage.published/PRJ-5771)
 
 ## Folder Structure
 The main folder ``Analyses`` contains all the regression, prediction, hazard implementation, testing, and library scripts. 
@@ -33,8 +33,7 @@ The ``Raw_files`` includes the files used to construct the synthetic datasets fo
     |     
     |--Raw_files
 
-An example regression dataset can be downloaded with ``source ./download_exampfiles.sh``.
-The syntetic datasets and raw metadata can be downloaded by running ``source ./download_data.sh`` and ``source ./download_rawfiles.sh``, respectively.
+An example regression dataset, as well as the synthetic datasets and raw metadata, can be downloaded from [DesignSafe](https://www.designsafe-ci.org/data/browser/public/designsafe.storage.published/PRJ-5771).
 
 ## Acknowledgments 
 Financial support by the California Department of Transportation and Pacific Gas & Electric Company is greatly appreciated.  
